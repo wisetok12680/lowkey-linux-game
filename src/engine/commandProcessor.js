@@ -1,4 +1,4 @@
-// Command Processor Engine for Lowkey Linux Simulator
+// Advanced Command Processor Engine for Lowkey Linux Simulator
 
 import { BANDIT_LEVELS } from './levels';
 
@@ -12,37 +12,27 @@ SYNOPSIS
        ls [OPTION]... [FILE]...
 
 DESCRIPTION
-       List  information  about  the FILEs (the current directory by default).
-       Sort entries alphabetically if non-specified.
-
-       -a, --all
-              do not ignore entries starting with .
-
-       -l     use a long listing format showing permissions, owner, size, date
-
-       -la, -al
-              combination of -l and -a
-
-EXAMPLE
-       ls -la /home/bandit0`,
+       List information about the FILEs (the current directory by default).
+       -a, --all        do not ignore entries starting with .
+       -l               use a long listing format
+       -la, -al         combination of -l and -a`,
 
   'cd': `CD(1)                          User Commands                         CD(1)
 
 NAME
-       cd - change the shell working directory
+       cd - change directory
 
 SYNOPSIS
        cd [DIRECTORY]
 
 DESCRIPTION
        Change the current working directory to DIRECTORY.
-       Default DIRECTORY is the home directory (~).
-       Use 'cd -' to switch back to the previous working directory.`,
+       Default DIRECTORY is home (~). Use 'cd -' to return to previous directory.`,
 
   'pwd': `PWD(1)                         User Commands                        PWD(1)
 
 NAME
-       pwd - print name of current/working directory
+       pwd - print working directory
 
 SYNOPSIS
        pwd`,
@@ -53,11 +43,11 @@ NAME
        cat - concatenate files and print on the standard output
 
 SYNOPSIS
-       cat [OPTION]... [FILE]...
+       cat [FILE]...
 
 DESCRIPTION
        Concatenate FILE(s) to standard output.
-       To read files named with leading dashes (-), use cat ./-`,
+       For files named with leading dashes (-), use: cat ./-`,
 
   'mkdir': `MKDIR(1)                       User Commands                      MKDIR(1)
 
@@ -82,10 +72,7 @@ NAME
 
 SYNOPSIS
        rm [OPTION]... [FILE]...
-
-OPTIONS
-       -r, -R, --recursive
-              remove directories and their contents recursively`,
+       -r, --recursive   remove directories and their contents recursively`,
 
   'cp': `CP(1)                          User Commands                         CP(1)
 
@@ -112,16 +99,12 @@ SYNOPSIS
        find [path...] [expression]
 
 EXPRESSIONS
-       -name pattern
-              Base of file name matches shell pattern.
-       -size n[c]
-              File uses n units of space (c = bytes).
-       -user uname
-              File is owned by user uname.
-       -group gname
-              File belongs to group gname.
-       -not -executable
-              Match files that are not executable.`,
+       -name pattern      match file name
+       -size n[c]         match file size (c = bytes)
+       -user uname        match file owner
+       -group gname       match file group owner
+       -perm mode         match file permissions
+       -not -executable   match non-executable files`,
 
   'chmod': `CHMOD(1)                       User Commands                      CHMOD(1)
 
@@ -129,11 +112,10 @@ NAME
        chmod - change file mode bits
 
 SYNOPSIS
-       chmod [OPTION]... MODE[,MODE]... FILE...
+       chmod [OPTION]... MODE FILE...
 
 DESCRIPTION
-       chmod changes the file mode bits of each given file.
-       MODE can be numeric (e.g. 755, 600) or symbolic (e.g. u+x, +x, go=r).`,
+       Change permissions using numeric octal (e.g. 755, 600) or symbolic (e.g. u+x, +x).`,
 
   'chown': `CHOWN(1)                       User Commands                      CHOWN(1)
 
@@ -141,7 +123,74 @@ NAME
        chown - change file owner and group
 
 SYNOPSIS
-       chown [OPTION]... [OWNER][:[GROUP]] FILE...`,
+       chown OWNER[:GROUP] FILE...`,
+
+  'grep': `GREP(1)                        User Commands                       GREP(1)
+
+NAME
+       grep - print lines that match patterns
+
+SYNOPSIS
+       grep [OPTION]... PATTERN [FILE]...
+
+DESCRIPTION
+       Search for PATTERN in each FILE or standard input.
+       -v, --invert-match   select non-matching lines
+       -i, --ignore-case    ignore case distinctions`,
+
+  'base64': `BASE64(1)                      User Commands                     BASE64(1)
+
+NAME
+       base64 - base64 encode/decode data and print to standard output
+
+SYNOPSIS
+       base64 [OPTION]... [FILE]
+
+DESCRIPTION
+       Base64 encode or decode FILE, or standard input.
+       -d, --decode   decode data`,
+
+  'head': `HEAD(1)                        User Commands                       HEAD(1)
+
+NAME
+       head - output the first part of files
+
+SYNOPSIS
+       head -n NUM [FILE]`,
+
+  'tail': `TAIL(1)                        User Commands                       TAIL(1)
+
+NAME
+       tail - output the last part of files
+
+SYNOPSIS
+       tail -n NUM [FILE]`,
+
+  'wc': `WC(1)                          User Commands                         WC(1)
+
+NAME
+       wc - print newline, word, and byte counts
+
+SYNOPSIS
+       wc [OPTION]... [FILE]...
+       -l, --lines   print the line counts`,
+
+  'sort': `SORT(1)                        User Commands                       SORT(1)
+
+NAME
+       sort - sort lines of text files
+
+SYNOPSIS
+       sort [FILE]...`,
+
+  'uniq': `UNIQ(1)                        User Commands                       UNIQ(1)
+
+NAME
+       uniq - report or omit repeated lines
+
+SYNOPSIS
+       uniq [OPTION]... [INPUT]
+       -u, --unique   only print unique lines`,
 
   'ssh': `SSH(1)                         User Commands                        SSH(1)
 
@@ -149,54 +198,75 @@ NAME
        ssh - OpenSSH remote login client
 
 SYNOPSIS
-       ssh [USER@]HOST [-i identity_file]
-
-DESCRIPTION
-       ssh connects and logs into the specified host.
-       Used in Bandit to progress between levels: ssh bandit1@localhost`,
+       ssh [USER@]HOST [-i identity_file]`,
 
   'apt': `APT(8)                         APT                                 APT(8)
 
 NAME
-       apt - command-line interface for package management
-
-SYNOPSIS
-       apt update | apt install PACKAGE`,
+       apt - command-line interface for package management`,
 
   'pacman': `PACMAN(8)                      Pacman Manual                     PACMAN(8)
 
 NAME
-       pacman - package manager utility
-
-SYNOPSIS
-       pacman -S PACKAGE`,
-
-  'flatpak': `FLATPAK(1)                    Flatpak Manual                    FLATPAK(1)
-
-NAME
-       flatpak - Application deployment framework
-
-SYNOPSIS
-       flatpak install PACKAGE`,
-
-  'snap': `SNAP(1)                       Snap Manual                       SNAP(1)
-
-NAME
-       snap - Tool to interact with snaps
-
-SYNOPSIS
-       snap install PACKAGE`
+       pacman - package manager utility`
 };
 
 export function processCommand(rawInput, state, setState) {
   const input = rawInput.trim();
   if (!input) return null;
 
-  // Add to command history
   const history = [...state.history, input];
 
-  // Tokenize preserving quoted strings
-  const tokens = parseCommandLine(input);
+  // Pipeline execution handling
+  if (input.includes('|')) {
+    const pipeSegments = input.split('|').map(s => s.trim());
+    let currentInputText = '';
+
+    for (let i = 0; i < pipeSegments.length; i++) {
+      const seg = pipeSegments[i];
+      const res = executeSingleCommand(seg, currentInputText, state, setState, history);
+      if (res && res.output !== undefined) {
+        currentInputText = res.output;
+      }
+      if (res && res.promptSSHModal) {
+        return res;
+      }
+    }
+
+    setState(prev => ({
+      ...prev,
+      history,
+      terminalLogs: [
+        ...prev.terminalLogs,
+        { type: 'input', user: state.currentUser, cwd: state.cwd, text: input },
+        ...(currentInputText ? [{ type: 'output', text: currentInputText }] : [])
+      ]
+    }));
+    return null;
+  }
+
+  // Single command execution
+  const res = executeSingleCommand(input, null, state, setState, history);
+  
+  if (res && res.skipLogUpdate) return res;
+
+  setState(prev => ({
+    ...prev,
+    cwd: res.newCwd !== undefined ? res.newCwd : prev.cwd,
+    prevCwd: res.newPrevCwd !== undefined ? res.newPrevCwd : prev.prevCwd,
+    history,
+    terminalLogs: [
+      ...prev.terminalLogs,
+      { type: 'input', user: state.currentUser, cwd: state.cwd, text: input },
+      ...(res.output ? [{ type: 'output', text: res.output }] : [])
+    ]
+  }));
+
+  return res;
+}
+
+function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
+  const tokens = parseCommandLine(cmdStr);
   const cmd = tokens[0]?.toLowerCase();
   const args = tokens.slice(1);
 
@@ -205,7 +275,6 @@ export function processCommand(rawInput, state, setState) {
   let newPrevCwd = state.prevCwd;
   let currentUser = state.currentUser;
   let currentLevel = state.currentLevel;
-  let installedPackages = new Set(state.installedPackages || []);
   let promptSSHModal = false;
   let sshTargetUser = null;
 
@@ -219,7 +288,7 @@ export function processCommand(rawInput, state, setState) {
 
     case 'clear': {
       setState(prev => ({ ...prev, history, terminalLogs: [] }));
-      return null;
+      return { skipLogUpdate: true };
     }
 
     case 'history': {
@@ -228,23 +297,19 @@ export function processCommand(rawInput, state, setState) {
     }
 
     case 'help': {
-      output = `Lowkey Linux - Command Reference & Shell Instructions
----------------------------------------------------
-File Navigation:  ls, cd, pwd, find
-File Operations:  cat, touch, mkdir, rm, cp, mv
-Permissions:      chmod, chown
-System Tools:     man, help, history, clear, exit
-Package Tools:    apt, flatpak, snap, pacman
-Remote Access:    ssh [user]@localhost
+      output = `Lowkey Linux Shell - Command Reference
+-----------------------------------------
+Filesystem & Search:  ls, cd, pwd, find, cat, head, tail, wc, sort, uniq, grep, base64
+File Modification:   touch, mkdir, rm, cp, mv, chmod, chown
+System & Network:    man, help, history, clear, exit, ssh, apt, pacman
 
-Tip: Type 'man <command>' for manual pages.
-Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
+Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base64 -d)`;
       break;
     }
 
     case 'man': {
       if (!args[0]) {
-        output = 'What manual page do you want?\nExample: man ls';
+        output = 'What manual page do you want?\nExample: man find';
       } else {
         const page = MAN_PAGES[args[0].toLowerCase()];
         output = page || `No manual entry for ${args[0]}`;
@@ -316,22 +381,19 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
     }
 
     case 'cat': {
+      if (stdinText !== null && args.length === 0) {
+        output = stdinText;
+        break;
+      }
+
       if (!args[0]) {
-        output = 'cat: missing filename argument\nExample: cat readme';
+        output = 'cat: missing filename argument';
         break;
       }
 
       const fileOutputs = [];
       for (let arg of args) {
-        let path = arg;
-        if (arg === '-') {
-          path = vfs.normalizePath(newCwd, '-', state.homeDir);
-        } else if (arg === './-') {
-          path = vfs.normalizePath(newCwd, '-', state.homeDir);
-        } else {
-          path = vfs.normalizePath(newCwd, arg, state.homeDir);
-        }
-
+        let path = arg === '-' || arg === './-' ? vfs.normalizePath(newCwd, '-', state.homeDir) : vfs.normalizePath(newCwd, arg, state.homeDir);
         const node = vfs.getNode(path);
         if (!node) {
           fileOutputs.push(`cat: ${arg}: No such file or directory`);
@@ -347,27 +409,171 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
       break;
     }
 
-    case 'mkdir': {
-      if (!args[0]) {
-        output = 'mkdir: missing operand';
+    case 'grep': {
+      let invertMatch = false;
+      let ignoreCase = false;
+      const patternsAndFiles = [];
+
+      for (const arg of args) {
+        if (arg === '-v' || arg === '--invert-match') invertMatch = true;
+        else if (arg === '-i' || arg === '--ignore-case') ignoreCase = true;
+        else patternsAndFiles.push(arg);
+      }
+
+      const pattern = patternsAndFiles[0] || '';
+      let textToSearch = stdinText;
+
+      if (textToSearch === null && patternsAndFiles[1]) {
+        const filePath = vfs.normalizePath(newCwd, patternsAndFiles[1], state.homeDir);
+        const node = vfs.getNode(filePath);
+        if (node && node.content) textToSearch = node.content;
+      }
+
+      if (textToSearch !== null) {
+        const lines = textToSearch.split('\n');
+        const flags = ignoreCase ? 'i' : '';
+        const regex = new RegExp(pattern, flags);
+
+        const matchedLines = lines.filter(line => {
+          const match = regex.test(line);
+          return invertMatch ? !match : match;
+        });
+        output = matchedLines.join('\n');
       } else {
+        output = 'grep: missing search pattern or file';
+      }
+      break;
+    }
+
+    case 'base64': {
+      let decode = false;
+      let targetFile = null;
+
+      for (const arg of args) {
+        if (arg === '-d' || arg === '--decode') decode = true;
+        else if (!arg.startsWith('-')) targetFile = arg;
+      }
+
+      let content = stdinText;
+      if (content === null && targetFile) {
+        const path = vfs.normalizePath(newCwd, targetFile, state.homeDir);
+        const node = vfs.getNode(path);
+        if (node && node.content) content = node.content;
+      }
+
+      if (content !== null) {
+        try {
+          if (decode) {
+            output = atob(content.trim().replace(/\s/g, ''));
+          } else {
+            output = btoa(content);
+          }
+        } catch (err) {
+          output = 'base64: invalid input payload';
+        }
+      } else {
+        output = 'base64: missing file input';
+      }
+      break;
+    }
+
+    case 'head':
+    case 'tail': {
+      let numLines = 10;
+      let fileArg = null;
+      for (let i = 0; i < args.length; i++) {
+        if (args[i] === '-n' && args[i + 1]) {
+          numLines = parseInt(args[i + 1], 10) || 10;
+          i++;
+        } else if (!args[i].startsWith('-')) {
+          fileArg = args[i];
+        }
+      }
+
+      let text = stdinText;
+      if (text === null && fileArg) {
+        const path = vfs.normalizePath(newCwd, fileArg, state.homeDir);
+        const node = vfs.getNode(path);
+        if (node && node.content) text = node.content;
+      }
+
+      if (text !== null) {
+        const lines = text.split('\n');
+        output = cmd === 'head' ? lines.slice(0, numLines).join('\n') : lines.slice(-numLines).join('\n');
+      }
+      break;
+    }
+
+    case 'wc': {
+      let text = stdinText;
+      if (text === null && args[0]) {
+        const path = vfs.normalizePath(newCwd, args[0], state.homeDir);
+        const node = vfs.getNode(path);
+        if (node && node.content) text = node.content;
+      }
+
+      if (text !== null) {
+        const lines = text.split('\n').length;
+        const words = text.trim().split(/\s+/).filter(Boolean).length;
+        const bytes = text.length;
+        output = `  ${lines}  ${words}  ${bytes}`;
+      }
+      break;
+    }
+
+    case 'sort': {
+      let text = stdinText;
+      if (text === null && args[0]) {
+        const path = vfs.normalizePath(newCwd, args[0], state.homeDir);
+        const node = vfs.getNode(path);
+        if (node && node.content) text = node.content;
+      }
+
+      if (text !== null) {
+        output = text.split('\n').sort().join('\n');
+      }
+      break;
+    }
+
+    case 'uniq': {
+      let text = stdinText;
+      if (text === null && args[0]) {
+        const path = vfs.normalizePath(newCwd, args[0], state.homeDir);
+        const node = vfs.getNode(path);
+        if (node && node.content) text = node.content;
+      }
+
+      if (text !== null) {
+        const lines = text.split('\n');
+        const countMap = {};
+        for (const l of lines) {
+          countMap[l] = (countMap[l] || 0) + 1;
+        }
+
+        if (args.includes('-u') || args.includes('--unique')) {
+          output = lines.filter(l => countMap[l] === 1).join('\n');
+        } else {
+          output = Array.from(new Set(lines)).join('\n');
+        }
+      }
+      break;
+    }
+
+    case 'mkdir': {
+      if (!args[0]) output = 'mkdir: missing operand';
+      else {
         for (const arg of args) {
           if (arg.startsWith('-')) continue;
           const target = vfs.normalizePath(newCwd, arg, state.homeDir);
-          const res = vfs.mkdir(target, currentUser, currentUser);
-          if (!res.success) {
-            output += `mkdir: cannot create directory '${arg}': ${res.error}\n`;
-          }
+          vfs.mkdir(target, currentUser, currentUser);
         }
-        output = output.trim();
       }
       break;
     }
 
     case 'touch': {
-      if (!args[0]) {
-        output = 'touch: missing file operand';
-      } else {
+      if (!args[0]) output = 'touch: missing file operand';
+      else {
         for (const arg of args) {
           const target = vfs.normalizePath(newCwd, arg, state.homeDir);
           vfs.touch(target, '', currentUser, currentUser);
@@ -384,15 +590,12 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
         else if (!arg.startsWith('-')) files.push(arg);
       }
 
-      if (files.length === 0) {
-        output = 'rm: missing operand';
-      } else {
+      if (files.length === 0) output = 'rm: missing operand';
+      else {
         for (const f of files) {
           const target = vfs.normalizePath(newCwd, f, state.homeDir);
           const res = vfs.rm(target, recursive);
-          if (!res.success) {
-            output += `rm: cannot remove '${f}': ${res.error}\n`;
-          }
+          if (!res.success) output += `rm: cannot remove '${f}': ${res.error}\n`;
         }
         output = output.trim();
       }
@@ -407,9 +610,8 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
         else if (!arg.startsWith('-')) paths.push(arg);
       }
 
-      if (paths.length < 2) {
-        output = 'cp: missing destination file operand after source';
-      } else {
+      if (paths.length < 2) output = 'cp: missing destination operand';
+      else {
         const src = vfs.normalizePath(newCwd, paths[0], state.homeDir);
         const dest = vfs.normalizePath(newCwd, paths[1], state.homeDir);
         const res = vfs.cp(src, dest, recursive);
@@ -419,9 +621,8 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
     }
 
     case 'mv': {
-      if (args.length < 2) {
-        output = 'mv: missing destination file operand after source';
-      } else {
+      if (args.length < 2) output = 'mv: missing destination operand';
+      else {
         const src = vfs.normalizePath(newCwd, args[0], state.homeDir);
         const dest = vfs.normalizePath(newCwd, args[1], state.homeDir);
         const res = vfs.mv(src, dest);
@@ -431,16 +632,14 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
     }
 
     case 'chmod': {
-      if (args.length < 2) {
-        output = 'chmod: missing operand\nUsage: chmod 755 file OR chmod +x file';
-      } else {
+      if (args.length < 2) output = 'chmod: missing operand\nUsage: chmod 755 file';
+      else {
         const mode = args[0];
         const file = args[1];
         const target = vfs.normalizePath(newCwd, file, state.homeDir);
         const node = vfs.getNode(target);
-        if (!node) {
-          output = `chmod: cannot access '${file}': No such file or directory`;
-        } else {
+        if (!node) output = `chmod: cannot access '${file}': No such file or directory`;
+        else {
           const res = vfs.chmod(node, mode);
           if (!res.success) output = `chmod: ${res.error}`;
         }
@@ -449,18 +648,14 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
     }
 
     case 'chown': {
-      if (args.length < 2) {
-        output = 'chown: missing operand\nUsage: chown user:group file';
-      } else {
+      if (args.length < 2) output = 'chown: missing operand\nUsage: chown user:group file';
+      else {
         const ownerGroup = args[0];
         const file = args[1];
         const target = vfs.normalizePath(newCwd, file, state.homeDir);
         const node = vfs.getNode(target);
-        if (!node) {
-          output = `chown: cannot access '${file}': No such file or directory`;
-        } else {
-          vfs.chown(node, ownerGroup);
-        }
+        if (!node) output = `chown: cannot access '${file}': No such file or directory`;
+        else vfs.chown(node, ownerGroup);
       }
       break;
     }
@@ -475,45 +670,21 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
         if (args[i] === '-user' && args[i + 1]) criteria.user = args[i + 1];
         if (args[i] === '-group' && args[i + 1]) criteria.group = args[i + 1];
         if (args[i] === '-size' && args[i + 1]) criteria.size = args[i + 1];
+        if (args[i] === '-perm' && args[i + 1]) criteria.perm = args[i + 1];
         if (args[i] === '-not' && args[i + 1] === '-executable') criteria.notExecutable = true;
       }
 
       const res = vfs.find(startAbs, criteria);
-      if (!res.success) {
-        output = `find: '${searchPath}': ${res.error}`;
-      } else {
-        output = res.results.join('\n');
-      }
+      if (!res.success) output = `find: '${searchPath}': ${res.error}`;
+      else output = res.results.join('\n');
       break;
     }
 
     case 'apt':
-    case 'pacman':
-    case 'flatpak':
-    case 'snap': {
+    case 'pacman': {
       const pkg = args[1] || args[0];
-      installedPackages.add(pkg || 'linux-utils');
-      output = `[${cmd.toUpperCase()}] Updating repository index...
-[${cmd.toUpperCase()}] Installing package '${pkg || 'linux-utils'}'...
-[${cmd.toUpperCase()}] Package installed successfully. Added system binary '/usr/bin/inspect-tool'.`;
-
-      // Add binary to VFS
+      output = `[${cmd.toUpperCase()}] Installing package '${pkg || 'linux-utils'}'...\nPackage installed successfully. Added system binary '/usr/bin/inspect-tool'.`;
       vfs.touch('/usr/bin/inspect-tool', 'Binary inspection utility', 'root', 'root', 'rwxr-xr-x');
-      break;
-    }
-
-    case 'inspect-tool': {
-      if (!args[0]) {
-        output = 'Usage: inspect-tool /path/to/log';
-      } else {
-        const target = vfs.normalizePath(newCwd, args[0], state.homeDir);
-        const node = vfs.getNode(target);
-        if (node && node.content) {
-          output = `[DECRYPTED VAULT PAYLOAD]\n${node.content}`;
-        } else {
-          output = 'inspect-tool: cannot read target log file';
-        }
-      }
       break;
     }
 
@@ -528,13 +699,12 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
       } else {
         const [targetUser] = targetArg.split('@');
         
-        // Level 7 Special check for id_rsa key permissions
         if (currentLevel === 7 && targetUser === 'bandit8') {
           const keyPath = vfs.normalizePath(newCwd, identityFile || 'id_rsa', state.homeDir);
           const keyNode = vfs.getNode(keyPath);
 
           if (!keyNode) {
-            output = `ssh: Could not resolve hostname or file '${identityFile || 'id_rsa'}': No such file`;
+            output = `ssh: Could not resolve file '${identityFile || 'id_rsa'}': No such file`;
             break;
           }
 
@@ -543,8 +713,6 @@ Tip: Type 'ssh banditX@localhost' or submit password to advance level.`;
 @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 Permissions ${keyNode.permissions} for '${keyNode.name}' are too open.
-It is required that your private key files are NOT accessible by others.
-This private key will be ignored.
 Load key "${keyNode.name}": bad permissions
 ${targetUser}@localhost: Permission denied (publickey).`;
             break;
@@ -569,25 +737,9 @@ ${targetUser}@localhost: Permission denied (publickey).`;
     }
   }
 
-  setState(prev => ({
-    ...prev,
-    cwd: newCwd,
-    prevCwd: newPrevCwd,
-    currentUser,
-    currentLevel,
-    history,
-    installedPackages,
-    terminalLogs: [
-      ...prev.terminalLogs,
-      { type: 'input', user: currentUser, cwd: state.cwd, text: input },
-      ...(output ? [{ type: 'output', text: output }] : [])
-    ]
-  }));
-
-  return { promptSSHModal, sshTargetUser };
+  return { output, newCwd, newPrevCwd, promptSSHModal, sshTargetUser };
 }
 
-// Shell command parser handling quotes and backslashes
 function parseCommandLine(cmdStr) {
   const args = [];
   let current = '';

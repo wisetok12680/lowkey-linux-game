@@ -68,7 +68,7 @@ export default function LevelHeader({ gameState, setGameState, currentLevelData,
         </div>
 
         {/* Level Steps Bar */}
-        <div className="hidden lg:flex items-center gap-1 bg-[#0c0e14] p-1 rounded-lg border border-[#1e2638]">
+        <div className="hidden lg:flex items-center gap-1 bg-[#0c0e14] p-1 rounded-lg border border-[#1e2638] max-w-xl overflow-x-auto">
           {BANDIT_LEVELS.map((lvl, index) => {
             const isCompleted = index < gameState.currentLevel;
             const isCurrent = index === gameState.currentLevel;

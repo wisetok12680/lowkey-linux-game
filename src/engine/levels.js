@@ -1,4 +1,4 @@
-// Level definitions for OverTheWire Bandit-style Linux game
+// Complex Level definitions for OverTheWire Bandit-style Linux CTF game (Levels 0 to 15)
 
 export const BANDIT_LEVELS = [
   {
@@ -6,30 +6,16 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 0 -> Level 1",
     user: "bandit0",
     homeDir: "/home/bandit0",
-    objective: "The password for the next level is stored in a file called 'readme' located in the home directory.",
+    objective: "The password for Level 1 is stored in a file called 'readme' located in the home directory.",
     hints: [
       "Use 'ls' to view files in the current directory.",
       "Use 'cat readme' to display the contents of the readme file.",
-      "Once you find the password, copy it and use 'ssh bandit1@localhost' or submit it."
+      "Copy the password and submit it or log in via SSH."
     ],
     password: "NH7nx1LgT89k3vPZ",
     initialTree: (vfs) => {
-      // Bandit 0 home directory setup
-      const b0 = vfs.getNode('/home/bandit0');
-      if (b0) {
-        b0.children = {
-          'readme': {
-            name: 'readme',
-            type: 'file',
-            owner: 'bandit0',
-            group: 'bandit0',
-            permissions: 'rw-r--r--',
-            size: 33,
-            mtime: 'Aug 11 12:00',
-            content: 'Level 1 Password: NH7nx1LgT89k3vPZ'
-          }
-        };
-      }
+      vfs.mkdir('/home/bandit0', 'bandit0', 'bandit0');
+      vfs.touch('/home/bandit0/readme', 'Level 1 Password: NH7nx1LgT89k3vPZ', 'bandit0', 'bandit0', 'rw-r--r--');
     }
   },
   {
@@ -37,31 +23,15 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 1 -> Level 2",
     user: "bandit1",
     homeDir: "/home/bandit1",
-    objective: "The password for the next level is stored in a file called '-' located in the home directory.",
+    objective: "The password for Level 2 is stored in a file called '-' located in the home directory.",
     hints: [
-      "Files starting with '-' can confuse commands because '-' usually denotes command flags.",
+      "Files starting with '-' can confuse commands because '-' usually denotes flags.",
       "Use 'cat ./-' or specify the relative path to read the file."
     ],
     password: "r48xP02kM91LqW7z",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit1', 'bandit1', 'bandit1');
-      const b1 = vfs.getNode('/home/bandit1');
-      if (b1) {
-        b1.owner = 'bandit1';
-        b1.group = 'bandit1';
-        b1.children = {
-          '-': {
-            name: '-',
-            type: 'file',
-            owner: 'bandit1',
-            group: 'bandit1',
-            permissions: 'rw-r--r--',
-            size: 28,
-            mtime: 'Aug 11 12:05',
-            content: 'Level 2 Password: r48xP02kM91LqW7z'
-          }
-        };
-      }
+      vfs.touch('/home/bandit1/-', 'Level 2 Password: r48xP02kM91LqW7z', 'bandit1', 'bandit1', 'rw-r--r--');
     }
   },
   {
@@ -69,7 +39,7 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 2 -> Level 3",
     user: "bandit2",
     homeDir: "/home/bandit2",
-    objective: "The password for the next level is stored in a file called 'spaces in this filename' located in the home directory.",
+    objective: "The password for Level 3 is stored in a file called 'spaces in this filename' located in the home directory.",
     hints: [
       "Spaces in file names need to be quoted or escaped in bash.",
       "Use double quotes: cat \"spaces in this filename\"",
@@ -78,23 +48,7 @@ export const BANDIT_LEVELS = [
     password: "Um83n2x9V1kL04pQ",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit2', 'bandit2', 'bandit2');
-      const b2 = vfs.getNode('/home/bandit2');
-      if (b2) {
-        b2.owner = 'bandit2';
-        b2.group = 'bandit2';
-        b2.children = {
-          'spaces in this filename': {
-            name: 'spaces in this filename',
-            type: 'file',
-            owner: 'bandit2',
-            group: 'bandit2',
-            permissions: 'rw-r--r--',
-            size: 32,
-            mtime: 'Aug 11 12:10',
-            content: 'Level 3 Password: Um83n2x9V1kL04pQ'
-          }
-        };
-      }
+      vfs.touch('/home/bandit2/spaces in this filename', 'Level 3 Password: Um83n2x9V1kL04pQ', 'bandit2', 'bandit2', 'rw-r--r--');
     }
   },
   {
@@ -102,32 +56,18 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 3 -> Level 4",
     user: "bandit3",
     homeDir: "/home/bandit3",
-    objective: "The password for the next level is stored in a hidden file in the 'inhere' directory.",
+    objective: "The password for Level 4 is stored in a hidden file inside the nested 'inhere/deep/' directory tree.",
     hints: [
       "In Linux, hidden files begin with a dot (.)",
-      "Use 'cd inhere' to enter the directory.",
-      "Use 'ls -a' or 'ls -la' to view hidden files.",
-      "Read the file with 'cat .hidden' or similar."
+      "Use 'cd inhere' and inspect subdirectories with 'ls -a'."
     ],
     password: "pQ79vX01kL34n2m8",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit3', 'bandit3', 'bandit3');
       vfs.mkdir('/home/bandit3/inhere', 'bandit3', 'bandit3');
-      const inhere = vfs.getNode('/home/bandit3/inhere');
-      if (inhere) {
-        inhere.children = {
-          '.hidden': {
-            name: '.hidden',
-            type: 'file',
-            owner: 'bandit3',
-            group: 'bandit3',
-            permissions: 'rw-r--r--',
-            size: 30,
-            mtime: 'Aug 11 12:15',
-            content: 'Level 4 Password: pQ79vX01kL34n2m8'
-          }
-        };
-      }
+      vfs.mkdir('/home/bandit3/inhere/sub1', 'bandit3', 'bandit3');
+      vfs.mkdir('/home/bandit3/inhere/sub2', 'bandit3', 'bandit3');
+      vfs.touch('/home/bandit3/inhere/sub2/.hidden_vault', 'Level 4 Password: pQ79vX01kL34n2m8', 'bandit3', 'bandit3', 'rw-r--r--');
     }
   },
   {
@@ -135,24 +75,21 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 4 -> Level 5",
     user: "bandit4",
     homeDir: "/home/bandit4",
-    objective: "The password for the next level is stored in the only human-readable file in the 'inhere' directory.",
+    objective: "The password for Level 5 is stored in the only human-readable ASCII file among 15+ binary decoys in 'inhere/'.",
     hints: [
-      "Navigate to 'inhere' directory.",
       "Inspect files using 'cat ./-file00', 'cat ./-file01', etc.",
-      "Or use 'find inhere -type f' and test which one contains ASCII text."
+      "Or use 'find inhere -type f' and inspect contents."
     ],
     password: "koP89n31xQ45vL72",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit4', 'bandit4', 'bandit4');
       vfs.mkdir('/home/bandit4/inhere', 'bandit4', 'bandit4');
-      const inhere = vfs.getNode('/home/bandit4/inhere');
-      if (inhere) {
-        inhere.children = {
-          '-file00': { name: '-file00', type: 'file', owner: 'bandit4', group: 'bandit4', permissions: 'rw-r--r--', size: 30, mtime: 'Aug 11 12:20', content: '\xFF\x00\x02BINARY_DATA_BLOB' },
-          '-file01': { name: '-file01', type: 'file', owner: 'bandit4', group: 'bandit4', permissions: 'rw-r--r--', size: 30, mtime: 'Aug 11 12:20', content: '\xFE\x01\x88RAW_CORRUPTED' },
-          '-file02': { name: '-file02', type: 'file', owner: 'bandit4', group: 'bandit4', permissions: 'rw-r--r--', size: 32, mtime: 'Aug 11 12:20', content: 'Level 5 Password: koP89n31xQ45vL72' },
-          '-file03': { name: '-file03', type: 'file', owner: 'bandit4', group: 'bandit4', permissions: 'rw-r--r--', size: 30, mtime: 'Aug 11 12:20', content: '\x90\x90NOP_HEADER_DUMP' }
-        };
+      for (let i = 0; i < 8; i++) {
+        vfs.touch(`/home/bandit4/inhere/-file0${i}`, `\x7FELF\x02\x01\x01\x00_RAW_BINARY_NOISE_${i}`, 'bandit4', 'bandit4', 'rw-r--r--');
+      }
+      vfs.touch('/home/bandit4/inhere/-file07', 'Level 5 Password: koP89n31xQ45vL72', 'bandit4', 'bandit4', 'rw-r--r--');
+      for (let i = 8; i < 12; i++) {
+        vfs.touch(`/home/bandit4/inhere/-file${i}`, `\xFE\xFF_CORRUPTED_BLOB_${i}`, 'bandit4', 'bandit4', 'rw-r--r--');
       }
     }
   },
@@ -161,33 +98,24 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 5 -> Level 6",
     user: "bandit5",
     homeDir: "/home/bandit5",
-    objective: "The password for the next level is stored in a file under 'inhere' with properties: 1033 bytes in size, not executable, owned by user bandit5.",
+    objective: "The password for Level 6 is stored in a file under 'inhere' with properties: 1033 bytes in size, not executable, owned by user bandit5.",
     hints: [
-      "Use the 'find' command with criteria flags.",
-      "Try: find inhere -size 1033c -not -executable",
-      "Then read the matching file using 'cat'."
+      "Use 'find' with size and permission criteria.",
+      "Command: find inhere -size 1033c -not -executable",
+      "Read the matching file using 'cat'."
     ],
     password: "DX7kM023nL19vP84",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit5', 'bandit5', 'bandit5');
       vfs.mkdir('/home/bandit5/inhere', 'bandit5', 'bandit5');
-      vfs.mkdir('/home/bandit5/inhere/maybehere01', 'bandit5', 'bandit5');
-      vfs.mkdir('/home/bandit5/inhere/maybehere02', 'bandit5', 'bandit5');
-
-      const d1 = vfs.getNode('/home/bandit5/inhere/maybehere01');
-      if (d1) {
-        d1.children = {
-          '.file1': { name: '.file1', type: 'file', owner: 'bandit5', group: 'bandit5', permissions: 'rw-r--r--', size: 500, mtime: 'Aug 11 12:25', content: 'dummy' },
-          '.file2': { name: '.file2', type: 'file', owner: 'bandit5', group: 'bandit5', permissions: 'rwxr-xr-x', size: 1033, mtime: 'Aug 11 12:25', content: 'executable file' }
-        };
+      for (let i = 1; i <= 6; i++) {
+        const dir = `/home/bandit5/inhere/maybehere0${i}`;
+        vfs.mkdir(dir, 'bandit5', 'bandit5');
+        vfs.touch(`${dir}/.file1`, 'dummy content'.repeat(10), 'bandit5', 'bandit5', 'rw-r--r--');
+        vfs.touch(`${dir}/.file2`, 'exec content'.repeat(10), 'bandit5', 'bandit5', 'rwxr-xr-x');
       }
-
-      const d2 = vfs.getNode('/home/bandit5/inhere/maybehere02');
-      if (d2) {
-        d2.children = {
-          '.file1': { name: '.file1', type: 'file', owner: 'bandit5', group: 'bandit5', permissions: 'rw-r--r--', size: 1033, mtime: 'Aug 11 12:25', content: 'Level 6 Password: DX7kM023nL19vP84' }
-        };
-      }
+      const targetDir = '/home/bandit5/inhere/maybehere04';
+      vfs.touch(`${targetDir}/.target_file`, 'Level 6 Password: DX7kM023nL19vP84'.padEnd(1033, '#'), 'bandit5', 'bandit5', 'rw-r--r--');
     }
   },
   {
@@ -195,7 +123,7 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 6 -> Level 7",
     user: "bandit6",
     homeDir: "/home/bandit6",
-    objective: "The password for the next level is stored somewhere on the server owned by user bandit7 and group bandit6.",
+    objective: "The password for Level 7 is stored somewhere on the server owned by user bandit7 and group bandit6.",
     hints: [
       "Use 'find' searching from root '/': find / -user bandit7 -group bandit6",
       "Examine the path returned and read it with 'cat'."
@@ -203,8 +131,8 @@ export const BANDIT_LEVELS = [
     password: "zK89pX02mL14vN93",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit6', 'bandit6', 'bandit6');
-      vfs.mkdir('/var/log/bandit', 'bandit7', 'bandit6');
-      vfs.touch('/var/log/bandit/bandit7_password.txt', 'Level 7 Password: zK89pX02mL14vN93', 'bandit7', 'bandit6', 'r--r-----');
+      vfs.mkdir('/var/log/sys_audit', 'bandit7', 'bandit6');
+      vfs.touch('/var/log/sys_audit/bandit7.pass', 'Level 7 Password: zK89pX02mL14vN93', 'bandit7', 'bandit6', 'r--r-----');
     }
   },
   {
@@ -212,33 +140,154 @@ export const BANDIT_LEVELS = [
     name: "Bandit Level 7 -> Level 8",
     user: "bandit7",
     homeDir: "/home/bandit7",
-    objective: "SSH private key 'id_rsa' is in your home directory, but permissions are too open! Fix permissions with 'chmod' so SSH will accept it.",
+    objective: "SSH private key 'id_rsa' in home directory has unsafe permissions! Use 'chmod 600 id_rsa' to fix permissions, then SSH into bandit8.",
     hints: [
-      "Check current permissions using 'ls -l id_rsa'.",
-      "SSH requires private keys to be accessible ONLY by the owner (600 permissions).",
-      "Run 'chmod 600 id_rsa' or 'chmod u=rw,go= id_rsa'.",
-      "Then run 'ssh -i id_rsa bandit8@localhost' to proceed!"
+      "Check permissions: ls -l id_rsa",
+      "Run: chmod 600 id_rsa",
+      "Then run: ssh -i id_rsa bandit8@localhost"
     ],
     password: "qP90mL34vX81n2k7",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit7', 'bandit7', 'bandit7');
-      vfs.touch('/home/bandit7/id_rsa', '-----BEGIN RSA PRIVATE KEY-----\nBANDIT8_KEY_DATA_qP90mL34vX81n2k7\n-----END RSA PRIVATE KEY-----', 'bandit7', 'bandit7', 'rw-r--r--');
+      vfs.touch('/home/bandit7/id_rsa', '-----BEGIN RSA PRIVATE KEY-----\nBANDIT8_KEY_qP90mL34vX81n2k7\n-----END RSA PRIVATE KEY-----', 'bandit7', 'bandit7', 'rw-r--r--');
     }
   },
   {
     level: 8,
-    name: "Bandit Level 8 -> Master",
+    name: "Bandit Level 8 -> Level 9",
     user: "bandit8",
     homeDir: "/home/bandit8",
-    objective: "Package Management Task: Use package manager ('apt install linux-utils' or 'pacman -S inspect-tool') to decode the encrypted log file at /var/log/vault.log.",
+    objective: "Package Management: Install the inspection package using 'apt install linux-utils' to decode the encrypted log file at /var/log/vault.log.",
     hints: [
-      "Run package manager command: 'apt install linux-utils' or 'pacman -S inspect-tool'.",
-      "Once installed, inspect /var/log/vault.log or run 'inspect-tool /var/log/vault.log'."
+      "Run: apt install linux-utils",
+      "Then inspect /var/log/vault.log with inspect-tool."
     ],
-    password: "CONGRATS_BANDIT_MASTER_KEY_2026",
+    password: "mK90pL34vN81n2k7",
     initialTree: (vfs) => {
       vfs.mkdir('/home/bandit8', 'bandit8', 'bandit8');
-      vfs.touch('/var/log/vault.log', 'Encrypted Payload [Use inspect-tool]: CONGRATS_BANDIT_MASTER_KEY_2026', 'root', 'root', 'r--r--r--');
+      vfs.touch('/var/log/vault.log', 'Encrypted Payload [Use inspect-tool]: mK90pL34vN81n2k7', 'root', 'root', 'r--r--r--');
+    }
+  },
+  {
+    level: 9,
+    name: "Bandit Level 9 -> Level 10",
+    user: "bandit9",
+    homeDir: "/home/bandit9",
+    objective: "The password for Level 10 is stored in 'data.txt' and is the ONLY line of text that occurs only once in the file.",
+    hints: [
+      "Use pipeline sorting and uniq filtering.",
+      "Command: sort data.txt | uniq -u",
+      "Or: cat data.txt | sort | uniq -u"
+    ],
+    password: "xU91mL74vP09n3k2",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit9', 'bandit9', 'bandit9');
+      const lines = [];
+      for (let i = 0; i < 50; i++) {
+        lines.push(`DUPLICATE_DECOY_LINE_${i % 5}`);
+      }
+      lines.push('xU91mL74vP09n3k2');
+      vfs.touch('/home/bandit9/data.txt', lines.join('\n'), 'bandit9', 'bandit9', 'rw-r--r--');
+    }
+  },
+  {
+    level: 10,
+    name: "Bandit Level 10 -> Level 11",
+    user: "bandit10",
+    homeDir: "/home/bandit10",
+    objective: "The password for Level 11 is stored in 'data.txt', which contains base64 encoded data.",
+    hints: [
+      "Use base64 decoder.",
+      "Command: base64 -d data.txt",
+      "Or: cat data.txt | base64 -d"
+    ],
+    password: "b64_pW78mX01nL92kP34",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit10', 'bandit10', 'bandit10');
+      const pass = 'b64_pW78mX01nL92kP34';
+      vfs.touch('/home/bandit10/data.txt', btoa(pass), 'bandit10', 'bandit10', 'rw-r--r--');
+    }
+  },
+  {
+    level: 11,
+    name: "Bandit Level 11 -> Level 12",
+    user: "bandit11",
+    homeDir: "/home/bandit11",
+    objective: "The password for Level 12 is stored in 'data.txt', where all lowercase and uppercase letters have been rotated by 13 positions (ROT13).",
+    hints: [
+      "ROT13 is a simple substitution cipher.",
+      "In bash: cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"
+    ],
+    password: "rot13_vK92nL10mP45xQ78",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit11', 'bandit11', 'bandit11');
+      // Rot13 representation of rot13_vK92nL10mP45xQ78
+      vfs.touch('/home/bandit11/data.txt', 'ebg13_iX92aY10zC45xD78', 'bandit11', 'bandit11', 'rw-r--r--');
+    }
+  },
+  {
+    level: 12,
+    name: "Bandit Level 12 -> Level 13",
+    user: "bandit12",
+    homeDir: "/home/bandit12",
+    objective: "The password for Level 13 is stored in a repeated hex-dump compressed vault located at 'inhere/compressed_vault'.",
+    hints: [
+      "Use 'cat inhere/compressed_vault' or pipeline filters to extract the password token."
+    ],
+    password: "hex_zK90pL34vN81n2m9",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit12', 'bandit12', 'bandit12');
+      vfs.mkdir('/home/bandit12/inhere', 'bandit12', 'bandit12');
+      vfs.touch('/home/bandit12/inhere/compressed_vault', '0000000 1f8b 0800 0000 0000 0003 4bce 4f49\n0000010 4d8d 4f30 3474 36b0 3004 0070\nPassword: hex_zK90pL34vN81n2m9', 'bandit12', 'bandit12', 'rw-r--r--');
+    }
+  },
+  {
+    level: 13,
+    name: "Bandit Level 13 -> Level 14",
+    user: "bandit13",
+    homeDir: "/home/bandit13",
+    objective: "The password for Level 14 is stored in '/etc/bandit_pass/bandit14', but can only be read if you fix permissions using 'chmod 400 /home/bandit13/sshkey.private'.",
+    hints: [
+      "Check permissions: ls -l sshkey.private",
+      "Run: chmod 400 sshkey.private",
+      "Read key or login with: ssh -i sshkey.private bandit14@localhost"
+    ],
+    password: "key_qP89mL34vX01n2k9",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit13', 'bandit13', 'bandit13');
+      vfs.touch('/home/bandit13/sshkey.private', '-----BEGIN PRIVATE KEY-----\nBANDIT14_KEY_qP89mL34vX01n2k9\n-----END PRIVATE KEY-----', 'bandit13', 'bandit13', 'rw-rw-rw-');
+    }
+  },
+  {
+    level: 14,
+    name: "Bandit Level 14 -> Level 15",
+    user: "bandit14",
+    homeDir: "/home/bandit14",
+    objective: "The password for Level 15 can be retrieved from '/etc/bandit_pass/bandit14' by submitting the current password token.",
+    hints: [
+      "Use 'cat /etc/bandit_pass/bandit14' to inspect the password file."
+    ],
+    password: "token_pW90nL12vM45xQ78",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit14', 'bandit14', 'bandit14');
+      vfs.touch('/etc/bandit_pass/bandit14', 'token_pW90nL12vM45xQ78', 'root', 'bandit14', 'r--r-----');
+    }
+  },
+  {
+    level: 15,
+    name: "Bandit Level 15 -> Master Vault",
+    user: "bandit15",
+    homeDir: "/home/bandit15",
+    objective: "Master Level: Use a combination of 'find', 'chmod', and package inspection to locate and decrypt the final master key stored in '/var/log/master_vault.log'.",
+    hints: [
+      "Find master log: find /var/log -name '*master*'",
+      "Fix log permissions if needed: chmod 644 /var/log/master_vault.log",
+      "Run inspect-tool /var/log/master_vault.log to reveal the master flag!"
+    ],
+    password: "CONGRATS_BANDIT_CTF_MASTER_2026",
+    initialTree: (vfs) => {
+      vfs.mkdir('/home/bandit15', 'bandit15', 'bandit15');
+      vfs.touch('/var/log/master_vault.log', 'MASTER CTF FLAG: CONGRATS_BANDIT_CTF_MASTER_2026', 'root', 'bandit15', 'rw-r--r--');
     }
   }
 ];

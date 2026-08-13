@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { VFS } from './engine/vfs';
-import { BANDIT_LEVELS } from './engine/levels';
+import { COMPETITION_LEVELS } from './engine/levels';
 import LevelHeader from './components/LevelHeader';
 import Terminal from './components/Terminal';
-import RangerView from './components/RangerView';
 import CheatsheetModal from './components/CheatsheetModal';
 import SSHModal from './components/SSHModal';
 
@@ -11,7 +10,7 @@ export default function App() {
   const [gameState, setGameState] = useState(() => {
     const vfs = new VFS();
     const currentLevel = 0;
-    const initialData = BANDIT_LEVELS[0];
+    const initialData = COMPETITION_LEVELS[0];
     if (initialData.initialTree) {
       initialData.initialTree(vfs);
     }
@@ -26,7 +25,7 @@ export default function App() {
       history: [],
       installedPackages: new Set(),
       terminalLogs: [
-        { type: 'output', text: `LOWKEY LINUX GAME SYSTEM INITIALIZED.\nActive user: ${initialData.user}\nType 'help' or 'man' to get started.` }
+        { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux (Competition)\nLogged in as ${initialData.user}@localhost.` }
       ]
     };
   });
@@ -34,13 +33,13 @@ export default function App() {
   const [isCheatsheetOpen, setIsCheatsheetOpen] = useState(false);
   const [sshModalConfig, setSshModalConfig] = useState({ isOpen: false, targetUser: null });
 
-  const currentLevelData = BANDIT_LEVELS[gameState.currentLevel] || BANDIT_LEVELS[0];
+  const currentLevelData = COMPETITION_LEVELS[gameState.currentLevel] || COMPETITION_LEVELS[0];
 
   // Reset Game Progress
   const handleResetProgress = () => {
     if (window.confirm('Reset all progress back to Level 0?')) {
       const vfs = new VFS();
-      const initialData = BANDIT_LEVELS[0];
+      const initialData = COMPETITION_LEVELS[0];
       if (initialData.initialTree) {
         initialData.initialTree(vfs);
       }
@@ -54,7 +53,7 @@ export default function App() {
         history: [],
         installedPackages: new Set(),
         terminalLogs: [
-          { type: 'output', text: `SYSTEM RESET. Welcome back to Bandit Level 0.` }
+          { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux (Competition)\nLogged in as ${initialData.user}@localhost.` }
         ]
       });
     }
@@ -71,23 +70,15 @@ export default function App() {
         onOpenCheatsheet={() => setIsCheatsheetOpen(true)}
       />
 
-      {/* Main Content Area - Split View (Terminal + RANGER View) */}
-      <main className="flex-1 p-3 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-hidden">
-        {/* Terminal Pane */}
-        <section className="lg:col-span-7 h-full min-h-0">
+      {/* Main Content Area - Full-Width Terminal View */}
+      <main className="flex-1 p-3 overflow-hidden">
+        <section className="h-full min-h-0">
           <Terminal 
             gameState={gameState}
             setGameState={setGameState}
+            currentLevelData={currentLevelData}
             onOpenCheatsheet={() => setIsCheatsheetOpen(true)}
             onOpenSSHModal={(targetUser) => setSshModalConfig({ isOpen: true, targetUser })}
-          />
-        </section>
-
-        {/* Navigable RANGER File Manager Pane */}
-        <section className="lg:col-span-5 h-full min-h-0">
-          <RangerView 
-            gameState={gameState}
-            setGameState={setGameState}
           />
         </section>
       </main>

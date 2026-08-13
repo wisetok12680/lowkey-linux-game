@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { KeyRound, X, ShieldCheck, AlertCircle, Clipboard } from 'lucide-react';
-import { BANDIT_LEVELS } from '../engine/levels';
+import { COMPETITION_LEVELS } from '../engine/levels';
 
 export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGameState }) {
   const [passwordInput, setPasswordInput] = useState('');
@@ -8,9 +8,9 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
 
   if (!isOpen) return null;
 
-  const defaultUser = targetUser || `bandit${Math.min(BANDIT_LEVELS.length - 1, gameState.currentLevel + 1)}`;
-  const levelIdx = parseInt(defaultUser.replace('bandit', ''), 10);
-  const targetLevelObj = BANDIT_LEVELS[levelIdx] || BANDIT_LEVELS[gameState.currentLevel];
+  const defaultUser = targetUser || `user${Math.min(COMPETITION_LEVELS.length - 1, gameState.currentLevel + 1)}`;
+  const levelIdx = parseInt(defaultUser.replace('user', ''), 10);
+  const targetLevelObj = COMPETITION_LEVELS[levelIdx] || COMPETITION_LEVELS[gameState.currentLevel];
 
   const handleSSHConnect = (e) => {
     e.preventDefault();
@@ -20,19 +20,18 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
       setErrorMsg('');
       setGameState(prev => {
         const nextLevel = isNaN(levelIdx) ? prev.currentLevel : levelIdx;
-        const nextData = BANDIT_LEVELS[nextLevel] || BANDIT_LEVELS[prev.currentLevel];
+        const nextData = COMPETITION_LEVELS[nextLevel] || COMPETITION_LEVELS[prev.currentLevel];
         if (nextData && nextData.initialTree) {
           nextData.initialTree(prev.vfs);
         }
         return {
           ...prev,
           currentLevel: nextLevel,
-          currentUser: nextData ? nextData.user : `bandit${nextLevel}`,
-          cwd: nextData ? nextData.homeDir : `/home/bandit${nextLevel}`,
-          homeDir: nextData ? nextData.homeDir : `/home/bandit${nextLevel}`,
+          currentUser: nextData ? nextData.user : `user${nextLevel}`,
+          cwd: nextData ? nextData.homeDir : `/home/user${nextLevel}`,
+          homeDir: nextData ? nextData.homeDir : `/home/user${nextLevel}`,
           terminalLogs: [
-            ...prev.terminalLogs,
-            { type: 'output', text: `[SSH AUTHENTICATED] Logged into ${defaultUser}@localhost. Home: /home/${defaultUser}` }
+            { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux (Stage ${nextLevel})\nAuthenticated via SSH as ${defaultUser}@localhost.` }
           ]
         };
       });

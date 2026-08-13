@@ -1,4 +1,4 @@
-// Virtual File System (VFS) for Lowkey Linux / OverTheWire Bandit Game
+// Virtual File System (VFS) for Lowkey Linux System Competition
 
 export class VFS {
   constructor(initialTree = null) {
@@ -22,19 +22,19 @@ export class VFS {
           permissions: 'rwxr-xr-x',
           mtime: 'Aug 11 12:00',
           children: {
-            'bandit0': {
-              name: 'bandit0',
+            'user0': {
+              name: 'user0',
               type: 'dir',
-              owner: 'bandit0',
-              group: 'bandit0',
+              owner: 'user0',
+              group: 'user0',
               permissions: 'rwxr-x---',
               mtime: 'Aug 11 12:00',
               children: {
                 'readme': {
                   name: 'readme',
                   type: 'file',
-                  owner: 'bandit0',
-                  group: 'bandit0',
+                  owner: 'user0',
+                  group: 'user0',
                   permissions: 'rw-r--r--',
                   size: 33,
                   mtime: 'Aug 11 12:00',
@@ -73,23 +73,23 @@ export class VFS {
           permissions: 'rwxr-xr-x',
           mtime: 'Aug 11 12:00',
           children: {
-            'bandit_pass': {
-              name: 'bandit_pass',
+            'sys_pass': {
+              name: 'sys_pass',
               type: 'dir',
               owner: 'root',
               group: 'root',
               permissions: 'rwxr-x---',
               mtime: 'Aug 11 12:00',
               children: {
-                'bandit0': { name: 'bandit0', type: 'file', owner: 'root', group: 'bandit0', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'bandit0_start_key' },
-                'bandit1': { name: 'bandit1', type: 'file', owner: 'root', group: 'bandit1', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'NH7nx1LgT89k3vPZ' },
-                'bandit2': { name: 'bandit2', type: 'file', owner: 'root', group: 'bandit2', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'r48xP02kM91LqW7z' },
-                'bandit3': { name: 'bandit3', type: 'file', owner: 'root', group: 'bandit3', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'Um83n2x9V1kL04pQ' },
-                'bandit4': { name: 'bandit4', type: 'file', owner: 'root', group: 'bandit4', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'pQ79vX01kL34n2m8' },
-                'bandit5': { name: 'bandit5', type: 'file', owner: 'root', group: 'bandit5', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'koP89n31xQ45vL72' },
-                'bandit6': { name: 'bandit6', type: 'file', owner: 'root', group: 'bandit6', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'DX7kM023nL19vP84' },
-                'bandit7': { name: 'bandit7', type: 'file', owner: 'root', group: 'bandit7', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'zK89pX02mL14vN93' },
-                'bandit8': { name: 'bandit8', type: 'file', owner: 'root', group: 'bandit8', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'qP90mL34vX81n2k7' }
+                'user0': { name: 'user0', type: 'file', owner: 'root', group: 'user0', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'user0_start_key' },
+                'user1': { name: 'user1', type: 'file', owner: 'root', group: 'user1', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'NH7nx1LgT89k3vPZ' },
+                'user2': { name: 'user2', type: 'file', owner: 'root', group: 'user2', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'r48xP02kM91LqW7z' },
+                'user3': { name: 'user3', type: 'file', owner: 'root', group: 'user3', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'Um83n2x9V1kL04pQ' },
+                'user4': { name: 'user4', type: 'file', owner: 'root', group: 'user4', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'pQ79vX01kL34n2m8' },
+                'user5': { name: 'user5', type: 'file', owner: 'root', group: 'user5', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'koP89n31xQ45vL72' },
+                'user6': { name: 'user6', type: 'file', owner: 'root', group: 'user6', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'DX7kM023nL19vP84' },
+                'user7': { name: 'user7', type: 'file', owner: 'root', group: 'user7', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'zK89pX02mL14vN93' },
+                'user8': { name: 'user8', type: 'file', owner: 'root', group: 'user8', permissions: 'r--r-----', size: 16, mtime: 'Aug 11 12:00', content: 'qP90mL34vX81n2k7' }
               }
             }
           }
@@ -110,7 +110,7 @@ export class VFS {
   }
 
   // Normalize path relative to working directory and user home
-  normalizePath(cwd, targetPath, homeDir = '/home/bandit0') {
+  normalizePath(cwd, targetPath, homeDir = '/home/user0') {
     if (!targetPath) return cwd;
     let path = targetPath.trim();
 
@@ -185,25 +185,32 @@ export class VFS {
   }
 
   // Create directory
-  mkdir(path, owner, group) {
-    const { parent, name } = this.getParentAndName(path);
-    if (!parent || parent.type !== 'dir') return { success: false, error: 'No such file or directory' };
-    if (parent.children[name]) return { success: false, error: 'File exists' };
+  mkdir(path, owner = 'user0', group = 'user0', permissions = 'rwxr-xr-x') {
+    const norm = path.startsWith('/') ? path : '/' + path;
+    const parts = norm.split('/').filter(Boolean);
+    let curr = this.root;
 
-    parent.children[name] = {
-      name,
-      type: 'dir',
-      owner: owner || 'bandit0',
-      group: group || 'bandit0',
-      permissions: 'rwxr-xr-x',
-      mtime: 'Aug 11 12:00',
-      children: {}
-    };
-    return { success: true };
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i];
+      if (!curr.children) curr.children = {};
+      if (!curr.children[part]) {
+        curr.children[part] = {
+          name: part,
+          type: 'dir',
+          owner: owner || 'user0',
+          group: group || 'user0',
+          permissions,
+          mtime: 'Aug 11 12:00',
+          children: {}
+        };
+      }
+      curr = curr.children[part];
+    }
+    return curr;
   }
 
   // Create or touch file
-  touch(path, content = '', owner = 'bandit0', group = 'bandit0', permissions = 'rw-r--r--') {
+  touch(path, content = '', owner = 'user0', group = 'user0', permissions = 'rw-r--r--') {
     const { parent, name } = this.getParentAndName(path);
     if (!parent || parent.type !== 'dir') return { success: false, error: 'No such file or directory' };
 
@@ -372,8 +379,8 @@ export class VFS {
     const typeChar = node.type === 'dir' ? 'd' : '-';
     const perms = typeChar + (node.permissions || 'rw-r--r--');
     const links = node.type === 'dir' ? 2 : 1;
-    const owner = (node.owner || 'bandit0').padEnd(8);
-    const group = (node.group || 'bandit0').padEnd(8);
+    const owner = (node.owner || 'user0').padEnd(8);
+    const group = (node.group || 'user0').padEnd(8);
     const size = String(node.size || 4096).padStart(6);
     const mtime = node.mtime || 'Aug 11 12:00';
     return `${perms} ${links} ${owner} ${group} ${size} ${mtime} ${name}`;

@@ -1,11 +1,11 @@
-# LOWKEY LINUX — OverTheWire Bandit CTF Terminal Game
+# LOWKEY LINUX — Interactive System Competition
 
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-18.2-61DAFB?style=flat-square&logo=react)](https://reactjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-An interactive, web-based gamified Linux terminal simulator inspired by **OverTheWire Bandit**. Designed for students, CTF players, and security enthusiasts to learn Linux CLI commands, filesystem navigation, permission escalation, and data pipeline filtering in a safe, client-side sandbox.
+An interactive, web-based gamified Linux terminal simulator and system competition. Designed for students and security enthusiasts to learn Linux CLI commands, filesystem navigation, permission escalation, and data pipeline filtering in a safe, client-side sandbox.
 
 ---
 
@@ -16,11 +16,8 @@ An interactive, web-based gamified Linux terminal simulator inspired by **OverTh
   - Shell command history stack (`↑` / `↓` arrow keys & `history` command).
   - Pipe operator (`|`) support for text transformation pipelines (`cat file | grep -v 'decoy' | base64 -d`).
   - Native manual reader (`man <command>`).
-- 📁 **Navigable RANGER File Manager**:
-  - Live visual directory browser updating in real-time as terminal commands mutate the virtual file system.
-  - Node Inspector detailing permissions (`rwxr-xr-x` & `0755`), file sizes, owners, and file content previews.
-  - Toggleable hidden file visibility (`ls -a` equivalent).
-- 🏆 **16 Escalating CTF Challenges (Levels 0 to 15)**:
+  - Direct in-terminal flag submission (`submit <password>` or `flag <password>`).
+- 🏆 **16 Escalating Competition Stages (Levels 0 to 15)**:
   - From basic file reading to multi-layered pipeline decoding, `find` searches, `chmod`/`chown` permission repairs, SSH key authentication, and package manager payloads.
 - 📋 **Copy/Paste Usability**:
   - One-click copy buttons for terminal outputs and file contents.
@@ -38,7 +35,7 @@ An interactive, web-based gamified Linux terminal simulator inspired by **OverTh
 | **Permissions & Ownership** | `chmod` (numeric `755`/`600` & symbolic `+x`), `chown` (`user:group`) |
 | **Package Management** | `apt install`, `pacman -S` |
 | **Remote Access** | `ssh [user]@localhost` (`-i identity_file`) |
-| **System Utilities** | `man`, `help`, `history`, `clear`, `exit` |
+| **Competition Controls** | `submit <pass>`, `flag <pass>`, `man`, `help`, `history`, `clear`, `exit` |
 
 ---
 
@@ -105,18 +102,18 @@ An interactive, web-based gamified Linux terminal simulator inspired by **OverTh
 - **Password**: `koP89n31xQ45vL72`
 
 ### Level 5 → Level 6
-- **Goal**: Find file with 1033 bytes, non-executable, owned by user `bandit5`.
+- **Goal**: Find file with 1033 bytes, non-executable, owned by user `user5`.
 - **Command**: `find inhere -size 1033c -not -executable` → `cat inhere/maybehere04/.target_file`
 - **Password**: `DX7kM023nL19vP84`
 
 ### Level 6 → Level 7
-- **Goal**: Search system files owned by user `bandit7` and group `bandit6`.
-- **Command**: `find / -user bandit7 -group bandit6` → `cat /var/log/sys_audit/bandit7.pass`
+- **Goal**: Search system files owned by user `user7` and group `user6`.
+- **Command**: `find / -user user7 -group user6` → `cat /var/log/sys_audit/user7.pass`
 - **Password**: `zK89pX02mL14vN93`
 
 ### Level 7 → Level 8
 - **Goal**: Fix SSH private key permissions (`rw-------`).
-- **Command**: `chmod 600 id_rsa` → `ssh -i id_rsa bandit8@localhost`
+- **Command**: `chmod 600 id_rsa` → `ssh -i id_rsa user8@localhost`
 - **Password**: `qP90mL34vX81n2k7`
 
 ### Level 8 → Level 9
@@ -145,19 +142,19 @@ An interactive, web-based gamified Linux terminal simulator inspired by **OverTh
 - **Password**: `hex_zK90pL34vN81n2m9`
 
 ### Level 13 → Level 14
-- **Goal**: Fix permissions on private key to retrieve bandit14 pass.
-- **Command**: `chmod 400 sshkey.private` → `ssh -i sshkey.private bandit14@localhost`
+- **Goal**: Fix permissions on private key to retrieve user14 pass.
+- **Command**: `chmod 400 sshkey.private` → `ssh -i sshkey.private user14@localhost`
 - **Password**: `key_qP89mL34vX01n2k9`
 
 ### Level 14 → Level 15
 - **Goal**: Read system password token file.
-- **Command**: `cat /etc/bandit_pass/bandit14`
+- **Command**: `cat /etc/sys_pass/user14`
 - **Password**: `token_pW90nL12vM45xQ78`
 
 ### Level 15 → Master Vault
 - **Goal**: Locate master log, adjust permissions, and decode master flag.
 - **Command**: `find /var/log -name '*master*'` → `inspect-tool /var/log/master_vault.log`
-- **Password**: `CONGRATS_BANDIT_CTF_MASTER_2026`
+- **Password**: `CONGRATS_LINUX_MASTER_2026`
 
 </details>
 
@@ -167,7 +164,7 @@ An interactive, web-based gamified Linux terminal simulator inspired by **OverTh
 
 - **`src/engine/vfs.js`**: Pure JavaScript in-memory POSIX file system supporting node hierarchy, permissions checking, and path resolution.
 - **`src/engine/commandProcessor.js`**: Tokenizer, argument parser, and pipeline execution engine supporting shell commands and man page lookup.
-- **`src/engine/levels.js`**: CTF level declarations, target criteria, initial VFS state initializers, and hint sequences.
+- **`src/engine/levels.js`**: Competition level declarations, target criteria, initial VFS state initializers, and hint sequences.
 - **`src/components/`**: Modular React UI components built with Tailwind CSS and Lucide React icons.
 
 ---

@@ -1,6 +1,6 @@
 // Advanced Command Processor Engine for Lowkey Linux Simulator
 
-import { BANDIT_LEVELS } from './levels';
+import { COMPETITION_LEVELS } from './levels';
 
 export const MAN_PAGES = {
   'ls': `LS(1)                          User Commands                         LS(1)
@@ -296,12 +296,42 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
       break;
     }
 
+    case 'submit':
+    case 'flag': {
+      const submittedPass = args[0]?.trim();
+      const currentLevelData = COMPETITION_LEVELS[state.currentLevel];
+      if (!submittedPass) {
+        output = `Usage: submit <stage_password>\nSubmit the password token discovered in current stage to advance.`;
+      } else if (submittedPass === currentLevelData.password) {
+        const nextLevel = Math.min(COMPETITION_LEVELS.length - 1, state.currentLevel + 1);
+        const nextData = COMPETITION_LEVELS[nextLevel];
+        if (nextData && nextData.initialTree) {
+          nextData.initialTree(state.vfs);
+        }
+        setState(prev => ({
+          ...prev,
+          currentLevel: nextLevel,
+          currentUser: nextData.user,
+          cwd: nextData.homeDir,
+          homeDir: nextData.homeDir,
+          terminalLogs: [
+            { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextData.user}@localhost.` }
+          ]
+        }));
+        return { skipLogUpdate: true };
+      } else {
+        output = `[ERROR] Incorrect password token for Stage ${state.currentLevel}. Try again.`;
+      }
+      break;
+    }
+
     case 'help': {
       output = `Lowkey Linux Shell - Command Reference
 -----------------------------------------
 Filesystem & Search:  ls, cd, pwd, find, cat, head, tail, wc, sort, uniq, grep, base64
 File Modification:   touch, mkdir, rm, cp, mv, chmod, chown
-System & Network:    man, help, history, clear, exit, ssh, apt, pacman
+CTF & Progression:    submit <pass>, flag <pass>, ssh, man, help, history, clear, exit
+Package Manager:     apt, pacman
 
 Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base64 -d)`;
       break;
@@ -699,7 +729,7 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       } else {
         const [targetUser] = targetArg.split('@');
         
-        if (currentLevel === 7 && targetUser === 'bandit8') {
+        if (currentLevel === 7 && targetUser === 'user8') {
           const keyPath = vfs.normalizePath(newCwd, identityFile || 'id_rsa', state.homeDir);
           const keyNode = vfs.getNode(keyPath);
 

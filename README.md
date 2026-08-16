@@ -17,8 +17,13 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
   - Pipe operator (`|`) support for text transformation pipelines (`cat file | grep -v 'decoy' | base64 -d`).
   - Native manual reader (`man <command>`).
   - Direct in-terminal flag submission (`submit <password>` or `flag <password>`).
+- 🛡️ **Proctored Workshop Invigilation System**:
+  - Fullscreen monitoring with live pause overlay banners.
+  - **5-Strike Exit Limit**: Allows up to 5 fullscreen exit warnings before team disqualification.
 - 🏆 **16 Escalating Competition Stages (Levels 0 to 15)**:
   - From basic file reading to multi-layered pipeline decoding, `find` searches, `chmod`/`chown` permission repairs, SSH key authentication, and package manager payloads.
+- 🥇 **Master Vault Victory Screen (Level 16)**:
+  - Interactive celebratory landing screen featuring team certification badges, mastered systems capabilities matrix, and Master Flag verification.
 - 📋 **Copy/Paste Usability**:
   - One-click copy buttons for terminal outputs and file contents.
   - Direct paste support for solution password tokens and SSH prompts.
@@ -29,12 +34,12 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
 
 | Category | Supported Commands & Syntax |
 | :--- | :--- |
-| **Filesystem Navigation** | `ls` (`-a`, `-l`, `-la`), `cd`, `pwd`, `find` (`-name`, `-size`, `-user`, `-group`, `-perm`) |
-| **File Operations** | `cat` (supports `-`, `./-`, spaces), `touch`, `mkdir`, `rm` (`-r`), `cp`, `mv` |
-| **Text Processing & Pipes** | `grep` (`-v`, `-i`), `base64` (`-d`), `head`, `tail`, `wc` (`-l`), `sort`, `uniq` (`-u`), `\|` |
-| **Permissions & Ownership** | `chmod` (numeric `755`/`600` & symbolic `+x`), `chown` (`user:group`) |
+| **Filesystem Navigation** | `ls` (`-a`, `-l`, `-la`), `cd`, `pwd`, `whoami`, `find` (`-name`, `-size`, `-user`, `-group`, `-perm`) |
+| **File Operations** | `cat` (supports `-`, `./-`, spaces, binary streams), `touch`, `mkdir`, `rm` (`-r`), `cp`, `mv` |
+| **Text Processing & Pipes** | `grep` (`-v`, `-i`), `base64` (`-d`), `tr` (ROT13 rotation), `xxd`, `hexdump`, `head`, `tail`, `wc` (`-l`), `sort`, `uniq` (`-u`), `\|` |
+| **Permissions & Ownership** | `chmod` (numeric `755`/`600`/`400` & symbolic `+x`), `chown` (`user:group`) |
 | **Package Management** | `apt install`, `pacman -S` |
-| **Remote Access** | `ssh [user]@localhost` (`-i identity_file`) |
+| **Remote Access** | `ssh [user]@lowkey-linux` (`-i identity_file`) |
 | **Competition Controls** | `submit <pass>`, `flag <pass>`, `man`, `help`, `history`, `clear`, `exit` |
 
 ---
@@ -58,7 +63,7 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
    npm install
    ```
 
-3. **Start the Vite development server**:
+3. **Start the Next.js development server**:
    ```bash
    npm run dev
    ```
@@ -113,7 +118,7 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
 
 ### Level 7 → Level 8
 - **Goal**: Fix SSH private key permissions (`rw-------`).
-- **Command**: `chmod 600 id_rsa` → `ssh -i id_rsa user8@localhost`
+- **Command**: `chmod 600 id_rsa` → `ssh -i id_rsa user8@lowkey-linux`
 - **Password**: `qP90mL34vX81n2k7`
 
 ### Level 8 → Level 9
@@ -123,7 +128,7 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
 
 ### Level 9 → Level 10
 - **Goal**: Find the only line that occurs once in `data.txt`.
-- **Command**: `sort data.txt | uniq -u` or `cat data.txt | sort | uniq -u`
+- **Command**: `sort data.txt | uniq -u`
 - **Password**: `xU91mL74vP09n3k2`
 
 ### Level 10 → Level 11
@@ -132,29 +137,29 @@ An interactive, web-based gamified Linux terminal simulator and system competiti
 - **Password**: `b64_pW78mX01nL92kP34`
 
 ### Level 11 → Level 12
-- **Goal**: Decode ROT13 encrypted text.
-- **Command**: `cat data.txt` → ROT13 shift
-- **Password**: `rot13_vK92nL10mP45xQ78`
+- **Goal**: Translate ROT13 character rotation stream.
+- **Command**: `cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'`
+- **Password**: `rot13_vK92nL10mP45kQ78`
 
 ### Level 12 → Level 13
-- **Goal**: Extract password from compressed hex-dump file.
-- **Command**: `cat inhere/compressed_vault`
+- **Goal**: Inspect binary data stream using hex dump table.
+- **Command**: `xxd inhere/data.dat` or `hexdump inhere/data.dat`
 - **Password**: `hex_zK90pL34vN81n2m9`
 
 ### Level 13 → Level 14
-- **Goal**: Fix permissions on private key to retrieve user14 pass.
-- **Command**: `chmod 400 sshkey.private` → `ssh -i sshkey.private user14@localhost`
-- **Password**: `key_qP89mL34vX01n2k9`
+- **Goal**: Fix private key permissions, authenticate via SSH, and inspect system credentials.
+- **Command**: `chmod 400 sshkey.private` → `ssh -i sshkey.private team14@lowkey-linux` → `cat /etc/credentials/stage14.pass`
+- **Password**: `ssh_kP90mL34vX81n2m9`
 
 ### Level 14 → Level 15
-- **Goal**: Read system password token file.
-- **Command**: `cat /etc/sys_pass/user14`
+- **Goal**: Read system password token file in `/etc/sys_pass/`.
+- **Command**: `cat /etc/sys_pass/team14`
 - **Password**: `token_pW90nL12vM45xQ78`
 
-### Level 15 → Master Vault
-- **Goal**: Locate master log, adjust permissions, and decode master flag.
-- **Command**: `find /var/log -name '*master*'` → `inspect-tool /var/log/master_vault.log`
-- **Password**: `CONGRATS_LINUX_MASTER_2026`
+### Level 15 → Final Stage (Level 16 Victory)
+- **Goal**: Multi-stage Final Boss: `find` audit dump, `chmod` permissions, filter noise, translate ROT13, and decode Base64.
+- **Command**: `find /var/backups/ -group team15` → `chmod 640 /var/backups/system_audit/vault_dump.raw` → `sort /var/backups/system_audit/vault_dump.raw | uniq -u | tr 'A-Za-z' 'N-ZA-Mn-za-m' | base64 -d`
+- **Master Flag**: `MASTER_VAULT_FLAG_2026_ULTIMATE_LINUX_HERO`
 
 </details>
 

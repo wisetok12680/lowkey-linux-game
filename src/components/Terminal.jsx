@@ -155,13 +155,6 @@ export default function Terminal({ gameState, setGameState, currentLevelData, on
 
         <div className="flex items-center gap-2">
           <button 
-            onClick={(e) => { e.stopPropagation(); onOpenSSHModal(null); }}
-            className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded bg-slate-800/80 hover:bg-slate-700 text-emerald-400 border border-slate-700/80 transition select-none"
-          >
-            <KeyRound className="w-3 h-3" />
-            <span>SSH</span>
-          </button>
-          <button 
             onClick={(e) => { e.stopPropagation(); onOpenCheatsheet(); }}
             className="flex items-center gap-1.5 px-2.5 py-1 text-xs rounded text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition border border-transparent select-none"
           >

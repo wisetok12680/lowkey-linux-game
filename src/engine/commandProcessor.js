@@ -1,6 +1,7 @@
 // Advanced Command Processor Engine for Lowkey Linux System Competition
 
 import { COMPETITION_LEVELS, getTeamUsername, getTeamHomeDir } from './levels';
+import { submitFlagAPI } from '../services/api';
 
 export const MAN_PAGES = {
   'ls': `LS(1)                          User Commands                         LS(1)
@@ -401,6 +402,16 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
       const userKey = state.teamName || state.currentUser;
       const currentLvl = state.currentLevel;
 
+      // Immediate UI feedback: render submitted input line right away so there is 0 latency on enter
+      setState(prev => ({
+        ...prev,
+        terminalLogs: [
+          ...prev.terminalLogs,
+          { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+          { type: 'output', text: 'Verifying password token...' }
+        ]
+      }));
+
       (async () => {
         const res = await submitFlagAPI(userKey, currentLvl, submittedPass);
         
@@ -408,8 +419,7 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
           setState(prev => ({
             ...prev,
             terminalLogs: [
-              ...prev.terminalLogs,
-              { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+              ...prev.terminalLogs.slice(0, -1),
               { type: 'output', text: res.error || '[ACCESS DENIED] Team Disqualified for Invigilation Violation.' }
             ]
           }));
@@ -430,8 +440,6 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
               cwd: nextHome,
               homeDir: nextHome,
               terminalLogs: [
-                ...prev.terminalLogs,
-                { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
                 {
                   type: 'output',
                   text: `================================================================================
@@ -459,6 +467,7 @@ You are officially a Lowkey Linux Systems Master!`
             if (nextData && nextData.initialTree) {
               nextData.initialTree(state.vfs, nextUser);
             }
+            // Automatically clear terminal logs upon stage advancement for a clean prompt
             setState(prev => ({
               ...prev,
               currentLevel: nextLevel,
@@ -466,8 +475,6 @@ You are officially a Lowkey Linux Systems Master!`
               cwd: nextHome,
               homeDir: nextHome,
               terminalLogs: [
-                ...prev.terminalLogs,
-                { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
                 { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextUser}@lowkey-linux.` }
               ]
             }));
@@ -476,8 +483,7 @@ You are officially a Lowkey Linux Systems Master!`
           setState(prev => ({
             ...prev,
             terminalLogs: [
-              ...prev.terminalLogs,
-              { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+              ...prev.terminalLogs.slice(0, -1),
               { type: 'output', text: res.error || `[ERROR] Incorrect password token for Stage ${currentLvl}. Try again.` }
             ]
           }));

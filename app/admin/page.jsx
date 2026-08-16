@@ -167,13 +167,26 @@ export default function AdminDashboardPage() {
       return name.includes(searchQuery.toLowerCase());
     })
     .sort((a, b) => {
-      if (b.highest_level_unlocked !== a.highest_level_unlocked) {
-        return b.highest_level_unlocked - a.highest_level_unlocked;
+      // Primary tie-breaker: Highest Stage / Completion level reached (e.g. 16/16 > 15/16)
+      const aHighest = a.highest_level_unlocked || a.current_level || 0;
+      const bHighest = b.highest_level_unlocked || b.current_level || 0;
+
+      if (bHighest !== aHighest) {
+        return bHighest - aHighest;
       }
-      if (b.current_level !== a.current_level) {
-        return b.current_level - a.current_level;
+
+      // Secondary tie-breaker: If tied on highest stage, rank by who reached it FIRST (earlier last_active_at timestamp)
+      const aTime = a.last_active_at ? new Date(a.last_active_at).getTime() : Infinity;
+      const bTime = b.last_active_at ? new Date(b.last_active_at).getTime() : Infinity;
+
+      if (aTime !== bTime) {
+        return aTime - bTime;
       }
-      return new Date(b.last_active_at) - new Date(a.last_active_at);
+
+      // Final fallback tie-breaker: Compare registration time (earlier created_at wins)
+      const aCreated = a.created_at ? new Date(a.created_at).getTime() : Infinity;
+      const bCreated = b.created_at ? new Date(b.created_at).getTime() : Infinity;
+      return aCreated - bCreated;
     });
 
   // High-level overview stats

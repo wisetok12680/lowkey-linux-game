@@ -215,8 +215,15 @@ export class VFS {
     if (!parent || parent.type !== 'dir') return { success: false, error: 'No such file or directory' };
 
     if (parent.children[name]) {
-      // Update mtime
+      // Update mtime, content, owner, group, and permissions if provided
       parent.children[name].mtime = 'Aug 11 12:00';
+      if (content !== undefined && content !== null) {
+        parent.children[name].content = content;
+        parent.children[name].size = content.length;
+      }
+      if (owner) parent.children[name].owner = owner;
+      if (group) parent.children[name].group = group;
+      if (permissions) parent.children[name].permissions = permissions;
     } else {
       parent.children[name] = {
         name,
@@ -346,19 +353,45 @@ export class VFS {
       let matches = true;
 
       if (criteria.name) {
-        const regex = new RegExp('^' + criteria.name.replace(/\*/g, '.*') + '$');
+        const cleanNamePattern = criteria.name.replace(/^['"]|['"]$/g, '');
+        const regexStr = '^' + cleanNamePattern.replace(/\./g, '\\.').replace(/\*/g, '.*').replace(/\?/g, '.') + '$';
+        const regex = new RegExp(regexStr, 'i');
         if (!regex.test(node.name)) matches = false;
       }
-      if (criteria.user && node.owner !== criteria.user) matches = false;
-      if (criteria.group && node.group !== criteria.group) matches = false;
+
+      if (criteria.type) {
+        if (criteria.type === 'f' && node.type !== 'file') matches = false;
+        if (criteria.type === 'd' && node.type !== 'dir') matches = false;
+      }
+
+      if (criteria.user) {
+        const targetUser = criteria.user.toLowerCase();
+        const owner = (node.owner || '').toLowerCase();
+        if (owner !== targetUser && !owner.startsWith(targetUser)) matches = false;
+      }
+
+      if (criteria.group) {
+        const targetGroup = criteria.group.toLowerCase();
+        const group = (node.group || '').toLowerCase();
+        if (group !== targetGroup && !group.startsWith(targetGroup)) matches = false;
+      }
+
       if (criteria.size !== undefined) {
         let reqSize = criteria.size;
         if (typeof reqSize === 'string' && reqSize.endsWith('c')) {
           reqSize = parseInt(reqSize.slice(0, -1), 10);
+        } else if (typeof reqSize === 'string' && reqSize.endsWith('k')) {
+          reqSize = parseInt(reqSize.slice(0, -1), 10) * 1024;
         }
         if (node.size !== reqSize) matches = false;
       }
-      if (criteria.notExecutable && this.hasPermission(node, node.owner, 'x')) matches = false;
+
+      if (criteria.notExecutable && this.hasPermission(node, node.owner || 'root', 'x')) matches = false;
+
+      if (criteria.empty) {
+        if (node.type === 'file' && (node.size !== 0 && node.content !== '')) matches = false;
+        if (node.type === 'dir' && Object.keys(node.children || {}).length > 0) matches = false;
+      }
 
       if (matches) results.push(currentPath);
 

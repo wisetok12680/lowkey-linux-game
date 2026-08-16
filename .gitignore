@@ -17,9 +17,10 @@ dist-isolation
 .vscode/*
 !.vscode/extensions.json
 .idea
-.solid
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Next.js build output
+.next
+.env*.local
+
+# Scratch scripts
+scratch/
+test_db.js

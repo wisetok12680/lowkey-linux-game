@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { BookOpen, Search, X, Terminal, Shield, Package, HardDrive } from 'lucide-react';
+import { BookOpen, Search, X, Terminal, Shield, Package, HardDrive, Filter } from 'lucide-react';
 import { MAN_PAGES } from '../engine/commandProcessor';
 
 export default function CheatsheetModal({ isOpen, onClose }) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCmd, setSelectedCmd] = useState('ls');
+  const [selectedCmd, setSelectedCmd] = useState('sort');
 
   if (!isOpen) return null;
 
@@ -12,17 +12,22 @@ export default function CheatsheetModal({ isOpen, onClose }) {
     {
       title: 'Linux Basics & File System',
       icon: Terminal,
-      commands: ['ls', 'cd', 'pwd', 'cat', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'history', 'clear', 'exit', 'help', 'man']
+      commands: ['ls', 'cd', 'pwd', 'whoami', 'cat', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'history', 'clear', 'exit', 'help', 'man']
+    },
+    {
+      title: 'Text Pipelines & Streams',
+      icon: Filter,
+      commands: ['sort', 'uniq', 'tr', 'xxd', 'hexdump', 'grep', 'base64', 'wc', 'head', 'tail']
     },
     {
       title: 'Permissions & Ownership',
       icon: Shield,
-      commands: ['chmod', 'chown']
+      commands: ['chmod', 'chown', 'sudo']
     },
     {
-      title: 'Package Management',
+      title: 'Package Management & Tools',
       icon: Package,
-      commands: ['apt', 'pacman', 'flatpak', 'snap']
+      commands: ['apt', 'pacman', 'inspect-tool', 'flatpak', 'snap']
     },
     {
       title: 'SSH & Network',
@@ -30,6 +35,8 @@ export default function CheatsheetModal({ isOpen, onClose }) {
       commands: ['ssh']
     }
   ];
+
+  const currentManPage = MAN_PAGES[selectedCmd.toLowerCase()] || `No documentation available for ${selectedCmd}.`;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 font-sans">
@@ -100,17 +107,15 @@ export default function CheatsheetModal({ isOpen, onClose }) {
             </div>
           </div>
 
-          {/* Man Page Viewer Right Area */}
-          <div className="flex-1 p-4 bg-[#0c0e14] overflow-y-auto font-mono text-xs text-slate-200">
-            <div className="mb-3 pb-2 border-b border-slate-800 flex items-center justify-between">
-              <span className="text-emerald-400 text-xs font-semibold">MANUAL: {selectedCmd.toUpperCase()}</span>
-              <span className="px-2 py-0.5 bg-slate-900 border border-slate-800 text-sky-400 rounded text-[10px]">
-                {selectedCmd}
-              </span>
+          {/* Main Manual View Area */}
+          <div className="flex-1 p-4 bg-[#0a0d14] overflow-y-auto font-mono text-xs text-slate-300">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-800 mb-3 select-none">
+              <span className="text-sky-400 font-bold uppercase">{selectedCmd}(1) Manual Page</span>
+              <span className="text-[10px] text-slate-500">Lowkey Linux Manual System</span>
             </div>
 
-            <pre className="whitespace-pre-wrap leading-relaxed text-slate-300 bg-[#10141d] p-3 rounded border border-slate-800/80 text-[11px] select-text">
-              {MAN_PAGES[selectedCmd] || `No manual page entry available for ${selectedCmd}`}
+            <pre className="whitespace-pre-wrap leading-relaxed select-text font-mono text-slate-200">
+              {currentManPage}
             </pre>
           </div>
         </div>

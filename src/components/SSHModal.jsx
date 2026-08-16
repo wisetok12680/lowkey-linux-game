@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { KeyRound, X, ShieldCheck, AlertCircle, Clipboard } from 'lucide-react';
-import { COMPETITION_LEVELS } from '../engine/levels';
+import { KeyRound, X, AlertCircle, Clipboard } from 'lucide-react';
+import { COMPETITION_LEVELS, getTeamUsername, getTeamHomeDir } from '../engine/levels';
 
-export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGameState }) {
+export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGameState, activePlayer }) {
   const [passwordInput, setPasswordInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   if (!isOpen) return null;
 
-  const defaultUser = targetUser || `user${Math.min(COMPETITION_LEVELS.length - 1, gameState.currentLevel + 1)}`;
-  const levelIdx = parseInt(defaultUser.replace('user', ''), 10);
+  const teamName = activePlayer?.team_name || activePlayer?.username || 'team';
+  const defaultUser = targetUser || getTeamUsername(teamName, Math.min(COMPETITION_LEVELS.length - 1, gameState.currentLevel + 1));
+  const levelIdx = parseInt(defaultUser.replace(/^[a-z]+/i, ''), 10) || (gameState.currentLevel + 1);
   const targetLevelObj = COMPETITION_LEVELS[levelIdx] || COMPETITION_LEVELS[gameState.currentLevel];
 
   const handleSSHConnect = (e) => {
@@ -21,17 +22,20 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
       setGameState(prev => {
         const nextLevel = isNaN(levelIdx) ? prev.currentLevel : levelIdx;
         const nextData = COMPETITION_LEVELS[nextLevel] || COMPETITION_LEVELS[prev.currentLevel];
+        const nextUser = getTeamUsername(teamName, nextLevel);
+        const nextHome = getTeamHomeDir(teamName, nextLevel);
+
         if (nextData && nextData.initialTree) {
-          nextData.initialTree(prev.vfs);
+          nextData.initialTree(prev.vfs, nextUser);
         }
         return {
           ...prev,
           currentLevel: nextLevel,
-          currentUser: nextData ? nextData.user : `user${nextLevel}`,
-          cwd: nextData ? nextData.homeDir : `/home/user${nextLevel}`,
-          homeDir: nextData ? nextData.homeDir : `/home/user${nextLevel}`,
+          currentUser: nextUser,
+          cwd: nextHome,
+          homeDir: nextHome,
           terminalLogs: [
-            { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux (Stage ${nextLevel})\nAuthenticated via SSH as ${defaultUser}@localhost.` }
+            { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux (Stage ${nextLevel})\nAuthenticated via SSH as ${nextUser}@lowkey-linux.` }
           ]
         };
       });
@@ -58,7 +62,7 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
         <div className="flex items-center justify-between px-5 py-3.5 bg-[#141926] border-b border-cyber-border select-none">
           <div className="flex items-center gap-2 text-white font-bold text-sm font-mono">
             <KeyRound className="w-4 h-4 text-cyber-accent" />
-            <span>ssh {defaultUser}@localhost</span>
+            <span>ssh {defaultUser}@lowkey-linux</span>
           </div>
 
           <button onClick={onClose} className="text-slate-400 hover:text-white transition">
@@ -70,7 +74,7 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
         <form onSubmit={handleSSHConnect} className="p-5 space-y-4 font-mono text-xs">
           <div className="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-1 select-none">
             <p className="text-cyber-cyan font-bold">OpenSSH Authentication Prompt</p>
-            <p className="text-slate-400">Enter password for <span className="text-cyber-accent">{defaultUser}@localhost</span>:</p>
+            <p className="text-slate-400">Enter password for <span className="text-cyber-accent">{defaultUser}@lowkey-linux</span>:</p>
           </div>
 
           <div className="space-y-1">

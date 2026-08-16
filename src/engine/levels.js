@@ -1,308 +1,550 @@
 // Linux Escalation Competition Levels (Levels 0 to 15)
 
+export function getTeamUsername(teamName, level) {
+  const clean = (teamName || 'team').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const baseName = clean || 'team';
+  if (level === 0) return baseName;
+  return `${baseName}${level}`;
+}
+
+export function getTeamHomeDir(teamName, level) {
+  const u = getTeamUsername(teamName, level);
+  return `/home/${u}`;
+}
+
 export const COMPETITION_LEVELS = [
   {
     level: 0,
     name: "Stage 0 -> Stage 1",
-    user: "user0",
-    homeDir: "/home/user0",
-    question: "How do you inspect the contents of a standard file in Linux?",
-    objective: "The password for Level 1 is stored in a file called 'readme' located in the home directory.",
+    user: "team",
+    homeDir: "/home/team",
+    concepts: [
+      "Standard Directory Navigation & Inspection",
+      "Reading Plaintext Files",
+      "Command Output Parsing"
+    ],
+    module: {
+      title: "Module 03: Terminal"
+    },
+    objective: [
+      "Inspect your home directory to locate the file named 'readme'.",
+      "Read the contents of the file to discover the secret password.",
+      "Submit the discovered password token to advance to Stage 1."
+    ],
     hints: [
-      "Use 'ls' to view files in the current directory.",
-      "Use 'cat readme' to display the contents of the readme file.",
-      "Copy the password and submit it or log in via SSH."
+      "List the files in your current working directory.",
+      "Display the text contents of the 'readme' file.",
+      "Submit the password token discovered inside the file."
     ],
     password: "NH7nx1LgT89k3vPZ",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user0', 'user0', 'user0');
-      vfs.touch('/home/user0/readme', 'Level 1 Password: NH7nx1LgT89k3vPZ', 'user0', 'user0', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team') => {
+      const u = teamUser || 'team';
+      vfs.mkdir('/home', 'root', 'root');
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/readme`, 'Level 1 Password: NH7nx1LgT89k3vPZ', u, u, 'rw-r--r--');
     }
   },
   {
     level: 1,
     name: "Stage 1 -> Stage 2",
-    user: "user1",
-    homeDir: "/home/user1",
-    question: "How do you read a file named '-' without it being parsed as a command option?",
-    objective: "The password for Level 2 is stored in a file called '-' located in the home directory.",
+    user: "team1",
+    homeDir: "/home/team1",
+    concepts: [
+      "Option Flag vs Filename Disambiguation",
+      "Relative Path Resolution ('./')",
+      "Shell Argument Parsing Rules"
+    ],
+    module: {
+      title: "Module 04: Filesystem"
+    },
+    objective: [
+      "Locate the file named '-' in your home directory.",
+      "Read its contents using a relative path prefix so the leading dash is not interpreted as a command flag.",
+      "Submit the password token to advance to Stage 2."
+    ],
     hints: [
-      "Files starting with '-' can confuse commands because '-' usually denotes flags.",
-      "Use 'cat ./-' or specify the relative path to read the file."
+      "Filenames starting with a dash (-) confuse commands because they look like options.",
+      "Use relative path notation starting with current directory reference to read the file."
     ],
     password: "r48xP02kM91LqW7z",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user1', 'user1', 'user1');
-      vfs.touch('/home/user1/-', 'Level 2 Password: r48xP02kM91LqW7z', 'user1', 'user1', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team1') => {
+      const u = teamUser || 'team1';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/-`, 'Level 2 Password: r48xP02kM91LqW7z', u, u, 'rw-r--r--');
     }
   },
   {
     level: 2,
     name: "Stage 2 -> Stage 3",
-    user: "user2",
-    homeDir: "/home/user2",
-    question: "How do you handle file names containing spaces in bash commands?",
-    objective: "The password for Level 3 is stored in a file called 'spaces in this filename' located in the home directory.",
+    user: "team2",
+    homeDir: "/home/team2",
+    concepts: [
+      "Whitespace & Argument Tokenization",
+      "String Quoting (Single & Double Quotes)",
+      "Character Escaping (Backslash '\\')"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Locate the file named 'spaces in this filename' inside your home directory.",
+      "Access and read this file by properly quoting or escaping the space characters in the path.",
+      "Submit the password token to advance to Stage 3."
+    ],
     hints: [
-      "Spaces in file names need to be quoted or escaped in bash.",
-      "Use double quotes: cat \"spaces in this filename\"",
-      "Or use backslash escaping: cat spaces\\ in\\ this\\ filename"
+      "Shells break arguments on whitespace unless quoted or escaped.",
+      "Enclose the filename in quotes or use backslash escaping for space characters."
     ],
     password: "Um83n2x9V1kL04pQ",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user2', 'user2', 'user2');
-      vfs.touch('/home/user2/spaces in this filename', 'Level 3 Password: Um83n2x9V1kL04pQ', 'user2', 'user2', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team2') => {
+      const u = teamUser || 'team2';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/spaces in this filename`, 'Level 3 Password: Um83n2x9V1kL04pQ', u, u, 'rw-r--r--');
     }
   },
   {
     level: 3,
     name: "Stage 3 -> Stage 4",
-    user: "user3",
-    homeDir: "/home/user3",
-    question: "How do you locate and list hidden files starting with a dot (.) in a directory tree?",
-    objective: "The password for Level 4 is stored in a hidden file inside the 'inhere' directory tree.",
+    user: "team3",
+    homeDir: "/home/team3",
+    concepts: [
+      "Dotfile Conventions in UNIX/Linux",
+      "Directory Attribute Flags",
+      "Hidden File Visibility"
+    ],
+    module: {
+      title: "Module 04: Filesystem"
+    },
+    objective: [
+      "Explore the 'inhere' directory tree for subdirectories containing hidden files starting with a dot (.).",
+      "Enable hidden file visibility in directory listings to locate '.hidden_vault'.",
+      "Read the hidden file and submit the password token for Stage 4."
+    ],
     hints: [
-      "In Linux, hidden files begin with a dot (.)",
-      "Use 'cd inhere' and inspect subdirectories with 'ls -a'."
+      "Linux hides files whose names begin with a period (.).",
+      "List directory contents with hidden flags enabled to reveal hidden files."
     ],
     password: "pQ79vX01kL34n2m8",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user3', 'user3', 'user3');
-      vfs.mkdir('/home/user3/inhere', 'user3', 'user3');
-      vfs.mkdir('/home/user3/inhere/sub1', 'user3', 'user3');
-      vfs.mkdir('/home/user3/inhere/sub2', 'user3', 'user3');
-      vfs.touch('/home/user3/inhere/sub2/.hidden_vault', 'Level 4 Password: pQ79vX01kL34n2m8', 'user3', 'user3', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team3') => {
+      const u = teamUser || 'team3';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir(`/home/${u}/inhere`, u, u);
+      vfs.mkdir(`/home/${u}/inhere/sub1`, u, u);
+      vfs.mkdir(`/home/${u}/inhere/sub2`, u, u);
+      vfs.touch(`/home/${u}/inhere/sub2/.hidden_vault`, 'Level 4 Password: pQ79vX01kL34n2m8', u, u, 'rw-r--r--');
     }
   },
   {
     level: 4,
     name: "Stage 4 -> Stage 5",
-    user: "user4",
-    homeDir: "/home/user4",
-    question: "How do you distinguish human-readable ASCII text files from raw binary files?",
-    objective: "The password for Level 5 is stored in the only human-readable ASCII file located within the 'inhere' directory.",
+    user: "team4",
+    homeDir: "/home/team4",
+    concepts: [
+      "File MIME & Encoding Classification",
+      "ASCII Human-Readable vs Raw Binary Noise",
+      "Data Stream Inspection"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Explore the 'inhere' directory containing multiple data files.",
+      "Identify the single human-readable ASCII text file among the raw binary files.",
+      "Read the ASCII text file and submit the password token for Stage 5."
+    ],
     hints: [
-      "Inspect files using 'cat ./-file00', 'cat ./-file01', etc.",
-      "Or use 'find inhere -type f' and inspect contents."
+      "Use file type classification utilities to determine ASCII vs binary data.",
+      "Inspect file contents to locate the plain text payload."
     ],
     password: "koP89n31xQ45vL72",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user4', 'user4', 'user4');
-      vfs.mkdir('/home/user4/inhere', 'user4', 'user4');
-      for (let i = 0; i < 8; i++) {
-        vfs.touch(`/home/user4/inhere/-file0${i}`, `\x7FELF\x02\x01\x01\x00_RAW_BINARY_NOISE_${i}`, 'user4', 'user4', 'rw-r--r--');
-      }
-      vfs.touch('/home/user4/inhere/-file07', 'Level 5 Password: koP89n31xQ45vL72', 'user4', 'user4', 'rw-r--r--');
-      for (let i = 8; i < 12; i++) {
-        vfs.touch(`/home/user4/inhere/-file${i}`, `\xFE\xFF_CORRUPTED_BLOB_${i}`, 'user4', 'user4', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team4') => {
+      const u = teamUser || 'team4';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir(`/home/${u}/inhere`, u, u);
+      for (let i = 0; i < 10; i++) {
+        const fileName = i < 10 ? `-file0${i}` : `-file${i}`;
+        if (i === 7) {
+          vfs.touch(`/home/${u}/inhere/-file07`, 'Level 5 Password: koP89n31xQ45vL72', u, u, 'rw-r--r--');
+        } else {
+          vfs.touch(`/home/${u}/inhere/${fileName}`, `\x7FELF\x02\x01\x01\x00_RAW_BINARY_NOISE_${i}`, u, u, 'rw-r--r--');
+        }
       }
     }
   },
   {
     level: 5,
     name: "Stage 5 -> Stage 6",
-    user: "user5",
-    homeDir: "/home/user5",
-    question: "How do you search for files matching specific criteria (size, permissions, owner) using 'find'?",
-    objective: "The password for Level 6 is stored in a file under 'inhere' with properties: 1033 bytes in size, not executable, owned by user user5.",
+    user: "team5",
+    homeDir: "/home/team5",
+    concepts: [
+      "Exact Byte-Size File Filtering",
+      "File Permission Attributes (Executable vs Non-Executable)",
+      "Recursive Filesystem Searching"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Search the 'inhere' directory tree for a file that is exactly 1033 bytes in size.",
+      "Ensure the target file is non-executable and owned by your stage user.",
+      "Read the target file and submit the password token for Stage 6."
+    ],
     hints: [
-      "Use 'find' with size and permission criteria.",
-      "Command: find inhere -size 1033c -not -executable",
-      "Read the matching file using 'cat'."
+      "Utilize recursive search tools to filter files by exact byte size.",
+      "Exclude executable files from your search criteria."
     ],
     password: "DX7kM023nL19vP84",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user5', 'user5', 'user5');
-      vfs.mkdir('/home/user5/inhere', 'user5', 'user5');
+    initialTree: (vfs, teamUser = 'team5') => {
+      const u = teamUser || 'team5';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir(`/home/${u}/inhere`, u, u);
       for (let i = 1; i <= 6; i++) {
-        const dir = `/home/user5/inhere/maybehere0${i}`;
-        vfs.mkdir(dir, 'user5', 'user5');
-        vfs.touch(`${dir}/.file1`, 'dummy content'.repeat(10), 'user5', 'user5', 'rw-r--r--');
-        vfs.touch(`${dir}/.file2`, 'exec content'.repeat(10), 'user5', 'user5', 'rwxr-xr-x');
+        const dir = `/home/${u}/inhere/maybehere04`;
+        vfs.mkdir(dir, u, u);
+        vfs.touch(`${dir}/file1`, 'dummy content '.repeat(15), u, u, 'rw-r--r--');
+        vfs.touch(`${dir}/file2`, 'exec content '.repeat(15), u, u, 'rwxr-xr-x');
       }
-      const targetDir = '/home/user5/inhere/maybehere04';
-      vfs.touch(`${targetDir}/.target_file`, 'Level 6 Password: DX7kM023nL19vP84'.padEnd(1033, '#'), 'user5', 'user5', 'rw-r--r--');
+      const targetDir = `/home/${u}/inhere/maybehere04`;
+      const secret = 'DX7kM023nL19vP84\n';
+      vfs.touch(`${targetDir}/target_file`, secret + ' '.repeat(1033 - secret.length), u, u, 'rw-r--r--');
     }
   },
   {
     level: 6,
     name: "Stage 6 -> Stage 7",
-    user: "user6",
-    homeDir: "/home/user6",
-    question: "How do you search the entire filesystem for files owned by specific user and group identities?",
-    objective: "The password for Level 7 is stored somewhere on the server owned by user user7 and group user6.",
+    user: "team6",
+    homeDir: "/home/team6",
+    concepts: [
+      "Linux Group Ownership & Access Control",
+      "System-Wide Filesystem Auditing",
+      "Searching Outside Home Directories"
+    ],
+    module: {
+      title: "Module 04: Filesystem"
+    },
+    objective: [
+      "Your home directory is empty. Search the server starting from root '/' for files belonging to your team group.",
+      "Filter search results using your exact team group name shown in your prompt.",
+      "Inspect the matching audit file in '/var/log/sys_audit/' and submit the password for Stage 7."
+    ],
     hints: [
-      "Use 'find' searching from root '/': find / -user user7 -group user6",
-      "Examine the path returned and read it with 'cat'."
+      "Your home directory is empty. Perform a system-wide search from root for your team group.",
+      "Inspect the system path returned to read the password token."
     ],
     password: "zK89pX02mL14vN93",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user6', 'user6', 'user6');
-      vfs.mkdir('/var/log/sys_audit', 'user7', 'user6');
-      vfs.touch('/var/log/sys_audit/user7.pass', 'Level 7 Password: zK89pX02mL14vN93', 'user7', 'user6', 'r--r-----');
+    initialTree: (vfs, teamUser = 'team6') => {
+      const u = teamUser || 'team6';
+      const nextU = u.replace(/\d+$/, '') + '7';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir('/var/log/sys_audit', nextU, u);
+      vfs.touch('/var/log/sys_audit/sys_pass.pass', 'Level 7 Password: zK89pX02mL14vN93', nextU, u, 'r--r-----');
     }
   },
   {
     level: 7,
     name: "Stage 7 -> Stage 8",
-    user: "user7",
-    homeDir: "/home/user7",
-    question: "How do you set appropriate private key permissions ('chmod 600') before SSH authentication?",
-    objective: "An SSH private key 'id_rsa' in your home directory has permissions that are too open for authentication.",
+    user: "team7",
+    homeDir: "/home/team7",
+    concepts: [
+      "Superuser Privilege Elevation (Sudo)",
+      "Root File Ownership & Access Restrictions",
+      "SSH Private Key Permissions Security (Mode 600)"
+    ],
+    module: {
+      title: "Module 06: Permissions"
+    },
+    objective: [
+      "Check permissions on the root-owned private key 'id_rsa' in your home folder.",
+      "Elevate privileges using administrative superuser commands to set read-only permissions for the owner.",
+      "Enter your team's game login password when prompted for administrative authentication.",
+      "Read 'id_rsa' and submit the password token for Stage 8."
+    ],
     hints: [
-      "Check permissions: ls -l id_rsa",
-      "Run: chmod 600 id_rsa",
-      "Then run: ssh -i id_rsa user8@localhost"
+      "The key file is owned by root. Use superuser privilege elevation to change key permissions.",
+      "Enter your actual team password (the password used to log into the website)."
     ],
     password: "qP90mL34vX81n2k7",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user7', 'user7', 'user7');
-      vfs.touch('/home/user7/id_rsa', '-----BEGIN RSA PRIVATE KEY-----\nUSER8_KEY_qP90mL34vX81n2k7\n-----END RSA PRIVATE KEY-----', 'user7', 'user7', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team7') => {
+      const u = teamUser || 'team7';
+      const nextU = u.replace(/\d+$/, '') + '8';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/id_rsa`, `-----BEGIN RSA PRIVATE KEY-----\n${nextU.toUpperCase()}_KEY_qP90mL34vX81n2k7\n-----END RSA PRIVATE KEY-----`, 'root', 'root', '---------');
     }
   },
   {
     level: 8,
     name: "Stage 8 -> Stage 9",
-    user: "user8",
-    homeDir: "/home/user8",
-    question: "How do you install software packages using 'apt' to inspect and decode encrypted system logs?",
-    objective: "An encrypted log file exists at '/var/log/vault.log'. Use the package manager to install the inspection tool required to read it.",
+    user: "team8",
+    homeDir: "/home/team8",
+    concepts: [
+      "Package Management & Software Installation",
+      "System Utility Installation",
+      "Log Inspection Utilities"
+    ],
+    module: {
+      title: "Module 07: Packages"
+    },
+    objective: [
+      "An encrypted log file exists at '/var/log/vault.log'.",
+      "Use the package manager to install the 'linux-utils' software package.",
+      "Inspect the log file using the installed inspection utility to reveal the Stage 9 password."
+    ],
     hints: [
-      "Run: apt install linux-utils",
-      "Then inspect /var/log/vault.log with inspect-tool."
+      "Use the package manager command interface to install new utilities.",
+      "Run the installed inspection tool against the target log file."
     ],
     password: "mK90pL34vN81n2k7",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user8', 'user8', 'user8');
-      vfs.touch('/var/log/vault.log', 'Encrypted Payload [Use inspect-tool]: mK90pL34vN81n2k7', 'root', 'root', 'r--r--r--');
+    initialTree: (vfs, teamUser = 'team8') => {
+      const u = teamUser || 'team8';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch('/var/log/vault.log', '[ENCRYPTED LOG DATA STREAM 0x8F9A42]\n[RAW BINARY NOISE: 4F 6E 63 72 79 70 74 65 64]\n[ENCRYPTED PAYLOAD] Run inspect-tool /var/log/vault.log to decrypt log stream.', 'root', 'root', 'r--r--r--');
     }
   },
   {
     level: 9,
     name: "Stage 9 -> Stage 10",
-    user: "user9",
-    homeDir: "/home/user9",
-    question: "How do you combine 'sort' and 'uniq' in a pipeline to filter out duplicated lines?",
-    objective: "The password for Level 10 is stored in 'data.txt' and is the ONLY line of text that occurs only once in the file.",
+    user: "team9",
+    homeDir: "/home/team9",
+    concepts: [
+      "Unix Pipeline Redirection ('|')",
+      "Text Stream Sorting & Unique Filtering",
+      "Duplicate Removal in Large Datasets"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Open 'data.txt' in your home directory.",
+      "Filter out duplicate lines by sorting text and extracting the single unique line.",
+      "Submit the unique line as the Stage 10 password token."
+    ],
     hints: [
-      "Use pipeline sorting and uniq filtering.",
-      "Command: sort data.txt | uniq -u",
-      "Or: cat data.txt | sort | uniq -u"
+      "Filter text streams by sorting lines before running unique line analysis.",
+      "Configure unique filtering flags to output only lines with a single occurrence."
     ],
     password: "xU91mL74vP09n3k2",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user9', 'user9', 'user9');
+    initialTree: (vfs, teamUser = 'team9') => {
+      const u = teamUser || 'team9';
+      vfs.mkdir(`/home/${u}`, u, u);
       const lines = [];
-      for (let i = 0; i < 50; i++) {
-        lines.push(`DUPLICATE_DECOY_LINE_${i % 5}`);
+      const decoys = [];
+      const prefixes = ['alpha', 'beta', 'charlie', 'delta', 'echo', 'x_decoy_node_', 'z_vault_node_', 'zone_decoy_'];
+      for (let d = 0; d < 40; d++) {
+        const pfix = prefixes[d % prefixes.length];
+        const p1 = (d * 73 + 101).toString(36);
+        const p2 = (d * 109 + 211).toString(36);
+        decoys.push(`${pfix}_${p1}_decoy_${p2}`);
       }
-      lines.push('xU91mL74vP09n3k2');
-      vfs.touch('/home/user9/data.txt', lines.join('\n'), 'user9', 'user9', 'rw-r--r--');
+      for (let i = 0; i < 1000; i++) {
+        lines.push(decoys[i % decoys.length]);
+      }
+      lines.splice(432, 0, 'xU91mL74vP09n3k2');
+      vfs.touch(`/home/${u}/data.txt`, lines.join('\n'), u, u, 'rw-r--r--');
     }
   },
   {
     level: 10,
     name: "Stage 10 -> Stage 11",
-    user: "user10",
-    homeDir: "/home/user10",
-    question: "How do you decode Base64 encoded text from a file?",
-    objective: "The password for Level 11 is stored in 'data.txt', which contains base64 encoded data.",
+    user: "team10",
+    homeDir: "/home/team10",
+    concepts: [
+      "Base64 Binary-to-Text Encoding Schema",
+      "Data Stream Decoding",
+      "Plaintext Reconstruction"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Open 'data.txt' containing Base64 encoded payload text.",
+      "Decode the Base64 stream back into readable plaintext.",
+      "Submit the decoded text as the Stage 11 password token."
+    ],
     hints: [
-      "Use base64 decoder.",
-      "Command: base64 -d data.txt",
-      "Or: cat data.txt | base64 -d"
+      "Base64 represents binary or text payloads using printable ASCII characters.",
+      "Pass the data stream through a Base64 decoding tool."
     ],
     password: "b64_pW78mX01nL92kP34",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user10', 'user10', 'user10');
+    initialTree: (vfs, teamUser = 'team10') => {
+      const u = teamUser || 'team10';
+      vfs.mkdir(`/home/${u}`, u, u);
       const pass = 'b64_pW78mX01nL92kP34';
-      vfs.touch('/home/user10/data.txt', btoa(pass), 'user10', 'user10', 'rw-r--r--');
+      vfs.touch('/home/' + u + '/data.txt', btoa(pass), u, u, 'rw-r--r--');
     }
   },
   {
     level: 11,
     name: "Stage 11 -> Stage 12",
-    user: "user11",
-    homeDir: "/home/user11",
-    question: "How do you decode ROT13 character substitution using 'tr'?",
-    objective: "The password for Level 12 is stored in 'data.txt', where all lowercase and uppercase letters have been rotated by 13 positions (ROT13).",
-    hints: [
-      "ROT13 is a simple substitution cipher.",
-      "In bash: cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'"
+    user: "team11",
+    homeDir: "/home/team11",
+    concepts: [
+      "Alphabetical Rotation Ciphers (ROT13)",
+      "Character Stream Translation",
+      "Substitution Cipher Decryption"
     ],
-    password: "rot13_vK92nL10mP45xQ78",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user11', 'user11', 'user11');
-      vfs.touch('/home/user11/data.txt', 'ebg13_iX92aY10zC45xD78', 'user11', 'user11', 'rw-r--r--');
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Open 'data.txt' containing text rotated by 13 alphabet positions (ROT13).",
+      "Translate the ROT13 characters back to original plain text.",
+      "Submit the decoded text as the Stage 12 password token."
+    ],
+    hints: [
+      "ROT13 shifts alphabetic characters forward or backward by 13 places.",
+      "Use character translation utilities to map input character sets to shifted output sets."
+    ],
+    password: "rot13_vK92nL10mP45kQ78",
+    initialTree: (vfs, teamUser = 'team11') => {
+      const u = teamUser || 'team11';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/data.txt`, 'ebg13_iX92aY10zC45xD78', u, u, 'rw-r--r--');
     }
   },
   {
     level: 12,
     name: "Stage 12 -> Stage 13",
-    user: "user12",
-    homeDir: "/home/user12",
-    question: "How do you parse hex dumps and extract compressed data archives?",
-    objective: "The password for Level 13 is stored in the hex-dump archive located at 'inhere/compressed_vault'.",
+    user: "team12",
+    homeDir: "/home/team12",
+    concepts: [
+      "Formatted Hexadecimal Inspection (Hex Dumps)",
+      "Compressed Archive Streams",
+      "Binary Data Parsing"
+    ],
+    module: {
+      title: "Module 05: File Operations"
+    },
+    objective: [
+      "Inspect the hex-dump archive at 'inhere/compressed_vault'.",
+      "Parse the data stream to locate the cleartext password.",
+      "Submit the password to advance to Stage 13."
+    ],
     hints: [
-      "Use 'cat inhere/compressed_vault' or pipeline filters to extract the password token."
+      "Examine hex output formatting to locate cleartext data segments.",
+      "Read the archive contents to discover the password payload."
     ],
     password: "hex_zK90pL34vN81n2m9",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user12', 'user12', 'user12');
-      vfs.mkdir('/home/user12/inhere', 'user12', 'user12');
-      vfs.touch('/home/user12/inhere/compressed_vault', '0000000 1f8b 0800 0000 0000 0003 4bce 4f49\n0000010 4d8d 4f30 3474 36b0 3004 0070\nPassword: hex_zK90pL34vN81n2m9', 'user12', 'user12', 'rw-r--r--');
+    initialTree: (vfs, teamUser = 'team12') => {
+      const u = teamUser || 'team12';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir(`/home/${u}/inhere`, u, u);
+      vfs.touch(`/home/${u}/inhere/data.dat`, '\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03hex_zK90pL34vN81n2m9\x0a\x00_RAW_BINARY_DATA_', u, u, 'rw-r--r--');
     }
   },
   {
     level: 13,
     name: "Stage 13 -> Stage 14",
-    user: "user13",
-    homeDir: "/home/user13",
-    question: "How do you adjust SSH key file permissions ('chmod 400') to read protected credentials?",
-    objective: "The password for Level 14 is stored in '/etc/sys_pass/user14', but requires restricting permissions on the private SSH key in your home directory.",
-    hints: [
-      "Check permissions: ls -l sshkey.private",
-      "Run: chmod 400 sshkey.private",
-      "Read key or login with: ssh -i sshkey.private user14@localhost"
+    user: "team13",
+    homeDir: "/home/team13",
+    concepts: [
+      "Owner Read-Only Security Access Masks (Mode 400)",
+      "Private Key Identity Protection",
+      "System Credential Restrictions"
     ],
-    password: "key_qP89mL34vX01n2k9",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user13', 'user13', 'user13');
-      vfs.touch('/home/user13/sshkey.private', '-----BEGIN PRIVATE KEY-----\nUSER14_KEY_qP89mL34vX01n2k9\n-----END PRIVATE KEY-----', 'user13', 'user13', 'rw-rw-rw-');
+    module: {
+      title: "Module 08: SSH"
+    },
+    objective: [
+      "Locate the private SSH identity key file 'sshkey.private' in your home folder.",
+      "Restrict key access permissions so only the owner has read access (mode 400 or 600).",
+      "Connect via SSH using the identity file flag option to log into target user '<team_name>14@lowkey-linux'.",
+      "Navigate to '/etc/credentials/' on the remote host and inspect 'stage14.pass' to reveal the Stage 14 password token."
+    ],
+    hints: [
+      "Private keys must be restricted to mode 400 or 600 before OpenSSH accepts them.",
+      "After connecting via SSH, inspect system credential files under /etc/credentials/."
+    ],
+    password: "ssh_kP90mL34vX81n2m9",
+    initialTree: (vfs, teamUser = 'team13') => {
+      const u = teamUser || 'team13';
+      const nextU = u.replace(/\d+$/, '') + '14';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/home/${u}/sshkey.private`, `-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXktdjEAAAABG...${nextU.toUpperCase()}_KEY_SECRET\n-----END OPENSSH PRIVATE KEY-----`, u, u, 'rw-rw-rw-');
+      vfs.mkdir('/etc/credentials', 'root', 'root');
+      vfs.touch('/etc/credentials/stage14.pass', 'ssh_kP90mL34vX81n2m9', nextU, nextU, 'r--------');
     }
   },
   {
     level: 14,
     name: "Stage 14 -> Stage 15",
-    user: "user14",
-    homeDir: "/home/user14",
-    question: "How do you inspect system password files in '/etc/sys_pass/'?",
-    objective: "The password for Level 15 can be retrieved from '/etc/sys_pass/user14' by submitting the current password token.",
+    user: "team14",
+    homeDir: "/home/team14",
+    concepts: [
+      "System Configuration Directories ('/etc/')",
+      "Protected Password Credential Stores",
+      "Multi-User Environment Privilege Hierarchy"
+    ],
+    module: {
+      title: "Module 04: Filesystem"
+    },
+    objective: [
+      "Navigate to system password files under '/etc/sys_pass/'.",
+      "Read your team's credential file in '/etc/sys_pass/'.",
+      "Submit the password token for the final Master Vault."
+    ],
     hints: [
-      "Use 'cat /etc/sys_pass/user14' to inspect the password file."
+      "Navigate to system configuration directories under '/etc/'.",
+      "Read the system password credential file."
     ],
     password: "token_pW90nL12vM45xQ78",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user14', 'user14', 'user14');
-      vfs.touch('/etc/sys_pass/user14', 'token_pW90nL12vM45xQ78', 'root', 'user14', 'r--r-----');
+    initialTree: (vfs, teamUser = 'team14') => {
+      const u = teamUser || 'team14';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.touch(`/etc/sys_pass/${u}`, 'token_pW90nL12vM45xQ78', 'root', u, 'r--r-----');
     }
   },
   {
     level: 15,
-    name: "Stage 15 -> Master Vault",
-    user: "user15",
-    homeDir: "/home/user15",
-    question: "How do you combine Linux diagnostic tools ('find', 'chmod', 'apt', 'inspect-tool') for a final system audit?",
-    objective: "Master Level: Locate and decrypt the final master key stored in '/var/log/master_vault.log'.",
-    hints: [
-      "Find master log: find /var/log -name '*master*'",
-      "Fix log permissions if needed: chmod 644 /var/log/master_vault.log",
-      "Run inspect-tool /var/log/master_vault.log to reveal the master key!"
+    name: "Stage 15 -> Final Stage",
+    user: "team15",
+    homeDir: "/home/team15",
+    concepts: [
+      "System-Wide Forensic File Discovery ('find')",
+      "POSIX Access Control & Masking ('chmod')",
+      "Multi-Stage Stream Filtering ('grep' & 'uniq')",
+      "Character Rotation & Stream Decoding ('tr' & 'base64')"
     ],
-    password: "CONGRATS_LINUX_MASTER_2026",
-    initialTree: (vfs) => {
-      vfs.mkdir('/home/user15', 'user15', 'user15');
-      vfs.touch('/var/log/master_vault.log', 'MASTER KEY: CONGRATS_LINUX_MASTER_2026', 'root', 'user15', 'rw-r--r--');
+    module: {
+      title: "Module 09: Final Challenge"
+    },
+    objective: [
+      "Locate the restricted audit file in '/var/backups/system_audit/' owned by your user group.",
+      "Fix file permissions so your user account can read the audit payload.",
+      "Filter out duplicate decoy lines, translate the ROT13 cipher stream, and decode the Base64 payload.",
+      "Submit the Master Flag to complete the Linux competition!"
+    ],
+    hints: [
+      "Search system backup directories using find with group ownership criteria.",
+      "Modify file permissions if access is denied.",
+      "Chain text processing commands using pipes (|) to filter noise, translate ROT13 characters, and decode Base64."
+    ],
+    password: "MASTER_VAULT_FLAG_2026_ULTIMATE_LINUX_HERO",
+    initialTree: (vfs, teamUser = 'team15') => {
+      const u = teamUser || 'team15';
+      vfs.mkdir(`/home/${u}`, u, u);
+      vfs.mkdir('/var/backups', 'root', 'root');
+      vfs.mkdir('/var/backups/system_audit', 'root', u, 'rwxr-x---');
+
+      const passToken = "MASTER_VAULT_FLAG_2026_ULTIMATE_LINUX_HERO";
+      const b64 = btoa(passToken);
+      const rot13 = b64.replace(/[a-zA-Z]/g, c => {
+        const code = c.charCodeAt(0);
+        if (code >= 65 && code <= 90) return String.fromCharCode(((code - 65 + 13) % 26) + 65);
+        if (code >= 97 && code <= 122) return String.fromCharCode(((code - 97 + 13) % 26) + 97);
+        return c;
+      });
+
+      const dataset = [
+        "DECOY_AUDIT_LOG_NODE_001_INVALID",
+        "DECOY_AUDIT_LOG_NODE_001_INVALID",
+        "DECOY_AUDIT_LOG_NODE_002_INVALID",
+        "DECOY_AUDIT_LOG_NODE_002_INVALID",
+        "DECOY_AUDIT_LOG_NODE_003_INVALID",
+        "DECOY_AUDIT_LOG_NODE_003_INVALID",
+        rot13
+      ].sort().join('\n');
+
+      vfs.touch('/var/backups/system_audit/vault_dump.raw', dataset, 'root', u, '---------');
     }
   }
 ];

@@ -1,6 +1,6 @@
 // Advanced Command Processor Engine for Lowkey Linux Simulator
 
-import { COMPETITION_LEVELS } from './levels';
+import { COMPETITION_LEVELS, getTeamUsername, getTeamHomeDir } from './levels';
 
 export const MAN_PAGES = {
   'ls': `LS(1)                          User Commands                         LS(1)
@@ -178,19 +178,94 @@ SYNOPSIS
   'sort': `SORT(1)                        User Commands                       SORT(1)
 
 NAME
-       sort - sort lines of text files
+       sort - sort lines of text files or input streams
 
 SYNOPSIS
-       sort [FILE]...`,
+       sort [OPTION]... [FILE]...
+
+DESCRIPTION
+       Write sorted concatenation of all FILE(s) to standard output.
+       Alphabetizes text lines by default. Mandatory before running uniq for duplicate line filtering.
+
+EXAMPLES
+       sort names.txt
+              Sort lines of names.txt alphabetically.
+
+       sort names.txt | uniq -u
+              Sort names.txt and pipe into uniq -u to output unique lines.`,
 
   'uniq': `UNIQ(1)                        User Commands                       UNIQ(1)
 
 NAME
-       uniq - report or omit repeated lines
+       uniq - report or omit repeated lines from sorted input streams
 
 SYNOPSIS
        uniq [OPTION]... [INPUT]
-       -u, --unique   only print unique lines`,
+
+DESCRIPTION
+       Filter adjacent matching lines from INPUT (or standard input).
+       Note: Duplicate detection requires input lines to be sorted first!
+
+OPTIONS
+       -u, --unique
+              Only print unique lines (lines that appear exactly once).
+
+       -c, --count
+              Prefix lines by the number of occurrences.
+
+EXAMPLES
+       sort names.txt | uniq -u
+              Sort names.txt and print only lines that occur exactly once.`,
+
+  'tr': `TR(1)                          User Commands                        TR(1)
+
+NAME
+       tr - translate or delete characters from standard input stream
+
+SYNOPSIS
+       tr SET1 SET2
+
+DESCRIPTION
+       Translate, squeeze, and/or delete characters from standard input, writing to standard output.
+       SET1 and SET2 specify character ranges for mapping (e.g. lowercase to uppercase, or character rotation).
+
+EXAMPLES
+       cat file.txt | tr 'a-z' 'A-Z'
+              Translates all lowercase characters in file.txt to uppercase.
+
+       echo "hello" | tr 'a-z' 'n-za-m'
+              Translates lowercase characters using a 13-place alphabet rotation.`,
+
+  'xxd': `XXD(1)                         User Commands                        XXD(1)
+
+NAME
+       xxd - make a hexdump or do the reverse
+
+SYNOPSIS
+       xxd [FILE]
+
+DESCRIPTION
+       xxd creates a hex dump of a given file or standard input.
+       It displays hex byte values alongside their ASCII character representations.
+
+EXAMPLES
+       xxd data.dat
+              Print formatted hex dump and ASCII sidebar.`,
+
+  'whoami': `WHOAMI(1)                       User Commands                       WHOAMI(1)
+
+NAME
+       whoami - print effective user name
+
+SYNOPSIS
+       whoami
+
+DESCRIPTION
+       Print the user name associated with the current effective user ID.
+
+EXAMPLES
+       whoami
+              Print current active user account name.`,
 
   'ssh': `SSH(1)                         User Commands                        SSH(1)
 
@@ -208,7 +283,19 @@ NAME
   'pacman': `PACMAN(8)                      Pacman Manual                     PACMAN(8)
 
 NAME
-       pacman - package manager utility`
+       pacman - package manager utility`,
+
+  'inspect-tool': `INSPECT-TOOL(1)              System Diagnostics Utilities             INSPECT-TOOL(1)
+
+NAME
+       inspect-tool - decrypt and parse diagnostic system log data streams
+
+SYNOPSIS
+       inspect-tool <logfile>
+
+DESCRIPTION
+       inspect-tool is a diagnostic log inspection binary installed via the linux-utils package.
+       It decodes encrypted log data streams and extracts cleartext payloads.`
 };
 
 export function processCommand(rawInput, state, setState) {
@@ -220,7 +307,7 @@ export function processCommand(rawInput, state, setState) {
   // Pipeline execution handling
   if (input.includes('|')) {
     const pipeSegments = input.split('|').map(s => s.trim());
-    let currentInputText = '';
+    let currentInputText = null;
 
     for (let i = 0; i < pipeSegments.length; i++) {
       const seg = pipeSegments[i];
@@ -252,6 +339,8 @@ export function processCommand(rawInput, state, setState) {
 
   setState(prev => ({
     ...prev,
+    currentUser: res.newUser !== undefined ? res.newUser : prev.currentUser,
+    homeDir: res.newHomeDir !== undefined ? res.newHomeDir : prev.homeDir,
     cwd: res.newCwd !== undefined ? res.newCwd : prev.cwd,
     prevCwd: res.newPrevCwd !== undefined ? res.newPrevCwd : prev.prevCwd,
     history,
@@ -286,6 +375,11 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
       break;
     }
 
+    case 'whoami': {
+      output = currentUser;
+      break;
+    }
+
     case 'clear': {
       setState(prev => ({ ...prev, history, terminalLogs: [] }));
       return { skipLogUpdate: true };
@@ -303,19 +397,58 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
       if (!submittedPass) {
         output = `Usage: submit <stage_password>\nSubmit the password token discovered in current stage to advance.`;
       } else if (submittedPass === currentLevelData.password) {
+        if (state.currentLevel === 15) {
+          const nextLevel = 16;
+          const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
+          const nextUser = getTeamUsername(teamBase, nextLevel);
+          const nextHome = getTeamHomeDir(teamBase, nextLevel);
+
+          setState(prev => ({
+            ...prev,
+            currentLevel: 16,
+            currentUser: nextUser,
+            cwd: nextHome,
+            homeDir: nextHome,
+            terminalLogs: [
+              ...prev.terminalLogs,
+              { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+              {
+                type: 'output',
+                text: `================================================================================
+                    🏆 MASTER VAULT UNLOCKED! 🏆
+               CONGRATULATIONS - YOU HAVE COMPLETED LOWKEY LINUX!
+================================================================================
+
+[SYSTEM AUDIT COMPLETE]
+Master Flag Validated: MASTER_VAULT_FLAG_2026_ULTIMATE_LINUX_HERO
+
+You have mastered file navigation, POSIX permissions, package tools,
+SSH identity keys, Unix pipeline chaining, stream translation, and forensics!
+
+You are officially a Lowkey Linux Systems Master!`
+              }
+            ]
+          }));
+          return { skipLogUpdate: true };
+        }
+
         const nextLevel = Math.min(COMPETITION_LEVELS.length - 1, state.currentLevel + 1);
         const nextData = COMPETITION_LEVELS[nextLevel];
+        const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
+        const nextUser = getTeamUsername(teamBase, nextLevel);
+        const nextHome = getTeamHomeDir(teamBase, nextLevel);
+
         if (nextData && nextData.initialTree) {
-          nextData.initialTree(state.vfs);
+          nextData.initialTree(state.vfs, nextUser);
         }
         setState(prev => ({
           ...prev,
           currentLevel: nextLevel,
-          currentUser: nextData.user,
-          cwd: nextData.homeDir,
-          homeDir: nextData.homeDir,
+          currentUser: nextUser,
+          cwd: nextHome,
+          homeDir: nextHome,
           terminalLogs: [
-            { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextData.user}@localhost.` }
+            { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextUser}@lowkey-linux.` }
           ]
         }));
         return { skipLogUpdate: true };
@@ -328,10 +461,10 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
     case 'help': {
       output = `Lowkey Linux Shell - Command Reference
 -----------------------------------------
-Filesystem & Search:  ls, cd, pwd, find, cat, head, tail, wc, sort, uniq, grep, base64
+Filesystem & Search:  ls, cd, pwd, find, cat, head, tail, wc, sort, uniq, tr, grep, base64
 File Modification:   touch, mkdir, rm, cp, mv, chmod, chown
 CTF & Progression:    submit <pass>, flag <pass>, ssh, man, help, history, clear, exit
-Package Manager:     apt, pacman
+Package Manager & Tools: apt, pacman, inspect-tool <logfile>
 
 Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base64 -d)`;
       break;
@@ -432,7 +565,18 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
         } else if (!vfs.hasPermission(node, currentUser, 'r')) {
           fileOutputs.push(`cat: ${arg}: Permission denied`);
         } else {
-          fileOutputs.push(node.content || '');
+          if (node.name === 'sshkey.private' && (node.permissions === 'rw-rw-rw-' || node.permissions.includes('r--r--') || node.permissions.endsWith('r--'))) {
+            fileOutputs.push(`@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Permissions ${node.permissions} for '${node.name}' are too open.
+It is required that your private key files are NOT accessible by others.
+This private key will be ignored until file access permissions are restricted.`);
+          } else if (node.content && node.content.includes('_RAW_BINARY_DATA_')) {
+            fileOutputs.push('\x1f\x8b\x08\x00\x00\x00\x00\x00\x02\x03\x7f\x8b\x00\x0a\x0d\x1f\x8b\x04\x00\x00\x00');
+          } else {
+            fileOutputs.push(node.content || '');
+          }
         }
       }
       output = fileOutputs.join('\n');
@@ -507,6 +651,53 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       break;
     }
 
+    case 'file': {
+      if (args.length === 0) {
+        output = 'Usage: file <filename_or_pattern>\nDetermine file type of specified files.';
+        break;
+      }
+
+      const results = [];
+      for (const arg of args) {
+        let targetPaths = [];
+        if (arg.includes('*')) {
+          const parts = arg.split('/');
+          const pattern = parts.pop();
+          const parentDirStr = parts.join('/') || '.';
+          const parentPath = vfs.normalizePath(newCwd, parentDirStr, state.homeDir);
+          const parentNode = vfs.getNode(parentPath);
+          if (parentNode && parentNode.type === 'directory') {
+            const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+            targetPaths = Object.keys(parentNode.children)
+              .filter(name => regex.test(name))
+              .map(name => parentDirStr === '.' ? `./${name}` : `${parentDirStr}/${name}`);
+          }
+        } else {
+          targetPaths = [arg];
+        }
+
+        for (const itemPath of targetPaths) {
+          const fullPath = vfs.normalizePath(newCwd, itemPath, state.homeDir);
+          const node = vfs.getNode(fullPath);
+          if (!node) {
+            results.push(`${itemPath}: cannot open \`${itemPath}' (No such file or directory)`);
+          } else if (node.type === 'directory') {
+            results.push(`${itemPath}: directory`);
+          } else {
+            const content = node.content || '';
+            if (content.startsWith('\x7FELF') || content.includes('_RAW_BINARY_') || content.includes('\xFE\xFF')) {
+              results.push(`${itemPath}: data`);
+            } else {
+              results.push(`${itemPath}: ASCII text`);
+            }
+          }
+        }
+      }
+
+      output = results.join('\n');
+      break;
+    }
+
     case 'head':
     case 'tail': {
       let numLines = 10;
@@ -530,6 +721,19 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       if (text !== null) {
         const lines = text.split('\n');
         output = cmd === 'head' ? lines.slice(0, numLines).join('\n') : lines.slice(-numLines).join('\n');
+      }
+      break;
+    }
+
+    case 'xxd':
+    case 'hexdump': {
+      let fileArg = args.find(a => !a.startsWith('-'));
+      let path = vfs.normalizePath(newCwd, fileArg || 'data.dat', state.homeDir);
+      let node = vfs.getNode(path);
+      if (!node) {
+        output = `${cmd}: ${fileArg || 'file'}: No such file or directory`;
+      } else {
+        output = `00000000  1f 8b 08 00 00 00 00 00  02 03 68 65 78 5f 7a 4b  |..........hex_zK|\n00000010  39 30 70 4c 33 34 76 4e  38 31 6e 32 6d 39 0a 00  |90pL34vN81n2m9..|`;
       }
       break;
     }
@@ -585,6 +789,40 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
         } else {
           output = Array.from(new Set(lines)).join('\n');
         }
+      }
+      break;
+    }
+
+    case 'tr': {
+      let text = stdinText;
+      let set1 = args[0];
+      let set2 = args[1];
+
+      if (text === null) {
+        const fileArg = args.find(a => !a.startsWith('-') && a !== set1 && a !== set2);
+        if (fileArg) {
+          const path = vfs.normalizePath(newCwd, fileArg, state.homeDir);
+          const node = vfs.getNode(path);
+          if (node && node.content) text = node.content;
+        }
+      }
+
+      if (text !== null) {
+        const rot13Map = (str) => {
+          return str.replace(/[a-zA-Z]/g, (c) => {
+            const code = c.charCodeAt(0);
+            if (code >= 65 && code <= 90) {
+              return String.fromCharCode(((code - 65 + 13) % 26) + 65);
+            }
+            if (code >= 97 && code <= 122) {
+              return String.fromCharCode(((code - 97 + 13) % 26) + 97);
+            }
+            return c;
+          });
+        };
+        output = rot13Map(text);
+      } else {
+        output = 'tr: missing input stream\nUsage: tr SET1 SET2\nExample: tr "A-Z" "N-ZA-M"';
       }
       break;
     }
@@ -661,17 +899,46 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       break;
     }
 
+    case 'sudo': {
+      if (args.length === 0) {
+        output = 'usage: sudo [-u user] command';
+        break;
+      }
+
+      if (state.isSudoVerified) {
+        const innerCmdStr = args.join(' ');
+        const sudoState = { ...state, currentUser: 'root' };
+        const innerRes = processCommand(innerCmdStr, sudoState, setState);
+        output = innerRes && innerRes.output ? innerRes.output : 'Command executed with superuser privileges.';
+      } else {
+        return {
+          promptSudoPassword: true,
+          pendingCommand: cmdStr,
+          output: `[sudo] password for ${state.currentUser}: `
+        };
+      }
+      break;
+    }
+
     case 'chmod': {
-      if (args.length < 2) output = 'chmod: missing operand\nUsage: chmod 755 file';
+      if (args.length < 2) output = 'chmod: missing operand\nUsage: chmod <octal_mode> <file>';
       else {
         const mode = args[0];
         const file = args[1];
         const target = vfs.normalizePath(newCwd, file, state.homeDir);
         const node = vfs.getNode(target);
-        if (!node) output = `chmod: cannot access '${file}': No such file or directory`;
-        else {
+        if (!node) {
+          output = `chmod: cannot access '${file}': No such file or directory`;
+        } else if (node.owner === 'root' && state.currentUser !== 'root') {
+          output = `chmod: changing permissions of '${file}': Operation not permitted. Superuser privileges required.`;
+        } else {
+          if (state.isSudoVerified || state.currentUser === 'root') {
+            node.owner = state.homeDir ? (state.homeDir.split('/')[2] || state.currentUser) : state.currentUser;
+            node.group = node.owner;
+          }
           const res = vfs.chmod(node, mode);
           if (!res.success) output = `chmod: ${res.error}`;
+          else output = `mode of '${file}' changed to ${mode} (${node.permissions})`;
         }
       }
       break;
@@ -697,16 +964,23 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       const criteria = {};
       for (let i = 0; i < args.length; i++) {
         if (args[i] === '-name' && args[i + 1]) criteria.name = args[i + 1];
+        if (args[i] === '-type' && args[i + 1]) criteria.type = args[i + 1];
         if (args[i] === '-user' && args[i + 1]) criteria.user = args[i + 1];
         if (args[i] === '-group' && args[i + 1]) criteria.group = args[i + 1];
         if (args[i] === '-size' && args[i + 1]) criteria.size = args[i + 1];
         if (args[i] === '-perm' && args[i + 1]) criteria.perm = args[i + 1];
+        if (args[i] === '-empty') criteria.empty = true;
         if (args[i] === '-not' && args[i + 1] === '-executable') criteria.notExecutable = true;
       }
 
       const res = vfs.find(startAbs, criteria);
-      if (!res.success) output = `find: '${searchPath}': ${res.error}`;
-      else output = res.results.join('\n');
+      if (!res.success) {
+        output = `find: '${searchPath}': ${res.error}`;
+      } else if (res.results.length === 0) {
+        output = `find: no matching files found under '${searchPath}'.`;
+      } else {
+        output = res.results.join('\n');
+      }
       break;
     }
 
@@ -715,6 +989,27 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       const pkg = args[1] || args[0];
       output = `[${cmd.toUpperCase()}] Installing package '${pkg || 'linux-utils'}'...\nPackage installed successfully. Added system binary '/usr/bin/inspect-tool'.`;
       vfs.touch('/usr/bin/inspect-tool', 'Binary inspection utility', 'root', 'root', 'rwxr-xr-x');
+      break;
+    }
+
+    case 'inspect-tool': {
+      const inspectNode = vfs.getNode('/usr/bin/inspect-tool');
+      if (!inspectNode) {
+        output = `bash: inspect-tool: command not found. Use package manager to install 'linux-utils'.`;
+        break;
+      }
+      const fileArg = args[0];
+      if (!fileArg) {
+        output = 'inspect-tool: missing log file argument\nUsage: inspect-tool <logfile>';
+      } else {
+        const path = vfs.normalizePath(newCwd, fileArg, state.homeDir);
+        const node = vfs.getNode(path);
+        if (!node) {
+          output = `inspect-tool: cannot open '${fileArg}': No such file or directory`;
+        } else {
+          output = `[INSPECT-TOOL v2.4] Decrypting ${fileArg}...\nDecrypted Log Stream -> Level 9 Password: mK90pL34vN81n2k7`;
+        }
+      }
       break;
     }
 
@@ -729,29 +1024,48 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
       } else {
         const [targetUser] = targetArg.split('@');
         
-        if (currentLevel === 7 && targetUser === 'user8') {
-          const keyPath = vfs.normalizePath(newCwd, identityFile || 'id_rsa', state.homeDir);
-          const keyNode = vfs.getNode(keyPath);
+        const expectedUser = getTeamUsername(state.teamName || state.currentUser.replace(/\d+$/, ''), currentLevel + 1);
 
-          if (!keyNode) {
-            output = `ssh: Could not resolve file '${identityFile || 'id_rsa'}': No such file`;
+        if (currentLevel === 13) {
+          if (!identityFile) {
+            output = `Permission denied (publickey).\nIdentity key file required to authenticate.`;
             break;
           }
 
-          if (keyNode.permissions !== 'rw-------') {
+          const keyPath = vfs.normalizePath(newCwd, identityFile, state.homeDir);
+          const keyNode = vfs.getNode(keyPath);
+
+          if (!keyNode) {
+            output = `ssh: Could not resolve identity file '${identityFile}': No such file or directory`;
+            break;
+          }
+
+          if (keyNode.permissions !== 'r--------' && keyNode.permissions !== 'rw-------') {
             output = `@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 Permissions ${keyNode.permissions} for '${keyNode.name}' are too open.
+It is required that your private key files are NOT accessible by others.
 Load key "${keyNode.name}": bad permissions
-${targetUser}@localhost: Permission denied (publickey).`;
+${targetUser}@lowkey-linux: Permission denied (publickey).`;
             break;
           }
+
+          vfs.mkdir('/etc/credentials', 'root', 'root');
+          vfs.touch('/etc/credentials/stage14.pass', 'ssh_kP90mL34vX81n2m9', expectedUser, expectedUser, 'r--------');
+          vfs.mkdir(`/home/${expectedUser}`, expectedUser, expectedUser);
+          
+          return {
+            newUser: expectedUser,
+            newCwd: `/home/${expectedUser}`,
+            newHomeDir: `/home/${expectedUser}`,
+            output: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux SSH Remote Shell!\nAuthenticated as ${expectedUser}@lowkey-linux.\nLast login: Sun Aug 16 05:30:00 2026 from 127.0.0.1\n\nRemote shell session established for ${expectedUser}@lowkey-linux.\nInspect system credential files under /etc/credentials/ to discover the Stage 14 password token.`
+          };
         }
 
         promptSSHModal = true;
         sshTargetUser = targetUser;
-        output = `Connecting to ${targetUser}@localhost...`;
+        output = `Connecting to ${targetUser}@lowkey-linux...`;
       }
       break;
     }

@@ -415,7 +415,7 @@ export const COMPETITION_LEVELS = [
       title: "Module 05: File Operations"
     },
     objective: [
-      "Inspect the hex-dump archive at 'inhere/compressed_vault'.",
+      "Inspect the hex-dump archive at 'inhere/data.dat'.",
       "Parse the data stream to locate the cleartext password.",
       "Submit the password to advance to Stage 13."
     ],
@@ -445,10 +445,10 @@ export const COMPETITION_LEVELS = [
       title: "Module 08: SSH"
     },
     objective: [
-      "Locate the private SSH identity key file 'sshkey.private' in your home folder.",
+      "Locate the private SSH key file 'sshkey.private' in your home folder.",
       "Restrict key access permissions so only the owner has read access (mode 400 or 600).",
-      "Connect via SSH using the identity file flag option to log into target user '<team_name>14@lowkey-linux'.",
-      "Navigate to '/etc/credentials/' on the remote host and inspect 'stage14.pass' to reveal the Stage 14 password token."
+      "Use 'sshkey.private' to SSH into '<team_name>14@lowkey-linux'.",
+      "Navigate to '/etc/credentials/' on the remote host and inspect 'stage14.pass' to submit the Stage 14 password token."
     ],
     hints: [
       "Private keys must be restricted to mode 400 or 600 before OpenSSH accepts them.",

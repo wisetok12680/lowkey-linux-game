@@ -12,7 +12,7 @@ export default function CheatsheetModal({ isOpen, onClose }) {
     {
       title: 'Linux Basics & File System',
       icon: Terminal,
-      commands: ['ls', 'cd', 'pwd', 'whoami', 'cat', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'history', 'clear', 'exit', 'help', 'man']
+      commands: ['ls', 'cd', 'pwd', 'file', 'whoami', 'cat', 'touch', 'mkdir', 'rm', 'cp', 'mv', 'find', 'history', 'clear', 'exit', 'help', 'man']
     },
     {
       title: 'Text Pipelines & Streams',

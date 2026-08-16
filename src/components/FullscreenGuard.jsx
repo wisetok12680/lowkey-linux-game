@@ -34,8 +34,10 @@ export default function FullscreenGuard({ activePlayer, gameState, isWelcomeModa
         document.msFullscreenElement
       );
 
-      // Detect transition from FULLSCREEN -> NOT FULLSCREEN (Only when activePlayer is logged in and modal is closed)
-      if (wasFullscreenRef.current && !isFS && activePlayer && !isWelcomeModalOpen) {
+      const isFinished = gameState?.currentLevel >= 16;
+
+      // Detect transition from FULLSCREEN -> NOT FULLSCREEN (Only when activePlayer is logged in, modal is closed, and not finished)
+      if (wasFullscreenRef.current && !isFS && activePlayer && !isWelcomeModalOpen && !isFinished) {
         setExitCount(prev => {
           const newCount = prev + 1;
           const isDisq = newCount >= MAX_STRIKES;
@@ -66,7 +68,7 @@ export default function FullscreenGuard({ activePlayer, gameState, isWelcomeModa
       document.removeEventListener('mozfullscreenchange', checkFullscreen);
       document.removeEventListener('MSFullscreenChange', checkFullscreen);
     };
-  }, [storageKey, activePlayer, isWelcomeModalOpen]);
+  }, [storageKey, activePlayer, isWelcomeModalOpen, gameState?.currentLevel]);
 
   const requestFullscreenMode = () => {
     const elem = document.documentElement;
@@ -81,9 +83,10 @@ export default function FullscreenGuard({ activePlayer, gameState, isWelcomeModa
 
   const strikesRemaining = Math.max(0, MAX_STRIKES - exitCount);
   const isDisqualified = exitCount >= MAX_STRIKES;
+  const isFinished = gameState?.currentLevel >= 16;
 
-  // Don't render banner if team is not logged in, welcome modal is open, or currently in fullscreen (and not disqualified)
-  if (!activePlayer || isWelcomeModalOpen || (isFullscreen && !isDisqualified)) return null;
+  // Don't render banner if team is not logged in, welcome modal is open, challenge is completed (level >= 16), or currently in fullscreen (and not disqualified)
+  if (!activePlayer || isWelcomeModalOpen || isFinished || (isFullscreen && !isDisqualified)) return null;
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 font-sans animate-in fade-in duration-200">

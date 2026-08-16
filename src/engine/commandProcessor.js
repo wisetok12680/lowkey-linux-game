@@ -30,6 +30,18 @@ DESCRIPTION
        Change the current working directory to DIRECTORY.
        Default DIRECTORY is home (~). Use 'cd -' to return to previous directory.`,
 
+  'file': `FILE(1)                        User Commands                        FILE(1)
+
+NAME
+       file - determine file type
+
+SYNOPSIS
+       file [FILE]...
+
+DESCRIPTION
+       file tests each argument in an attempt to classify it.
+       Reports classifications such as 'ASCII text', 'directory', or 'data'.`,
+
   'pwd': `PWD(1)                         User Commands                        PWD(1)
 
 NAME
@@ -355,10 +367,50 @@ export function processCommand(rawInput, state, setState) {
   return res;
 }
 
+function expandGlobs(args, cwd, vfs, homeDir) {
+  const expandedArgs = [];
+
+  for (const arg of args) {
+    if (arg.includes('*')) {
+      let dirPath = '.';
+      let pattern = arg;
+
+      if (arg.includes('/')) {
+        const lastSlashIndex = arg.lastIndexOf('/');
+        dirPath = arg.substring(0, lastSlashIndex) || '/';
+        pattern = arg.substring(lastSlashIndex + 1);
+      }
+
+      const normDir = vfs.normalizePath(cwd, dirPath, homeDir);
+      const dirNode = vfs.getNode(normDir);
+
+      if (dirNode && dirNode.type === 'dir' && dirNode.children) {
+        const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+        const reg = new RegExp(`^${escaped}$`);
+        const matches = Object.keys(dirNode.children).filter(name => reg.test(name)).sort();
+
+        if (matches.length > 0) {
+          const prefix = dirPath === '.' ? '' : (dirPath.endsWith('/') ? dirPath : `${dirPath}/`);
+          for (const m of matches) {
+            expandedArgs.push(`${prefix}${m}`);
+          }
+          continue;
+        }
+      }
+    }
+
+    expandedArgs.push(arg);
+  }
+
+  return expandedArgs;
+}
+
 function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
   const tokens = parseCommandLine(cmdStr);
   const cmd = tokens[0]?.toLowerCase();
-  const args = tokens.slice(1);
+  const rawArgs = tokens.slice(1);
+  const vfs = state.vfs;
+  const args = expandGlobs(rawArgs, state.cwd, vfs, state.homeDir);
 
   let output = '';
   let newCwd = state.cwd;
@@ -367,8 +419,6 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
   let currentLevel = state.currentLevel;
   let promptSSHModal = false;
   let sshTargetUser = null;
-
-  const vfs = state.vfs;
 
   switch (cmd) {
     case 'pwd': {
@@ -512,6 +562,35 @@ Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base
         const page = MAN_PAGES[args[0].toLowerCase()];
         output = page || `No manual entry for ${args[0]}`;
       }
+      break;
+    }
+
+    case 'file': {
+      if (args.length === 0) {
+        output = 'Usage: file [FILE]...';
+        break;
+      }
+
+      const results = [];
+      for (const target of args) {
+        const norm = vfs.normalizePath(newCwd, target, state.homeDir);
+        const node = vfs.getNode(norm);
+        if (!node) {
+          results.push(`${target}: cannot open \`${target}' (No such file or directory)`);
+        } else if (node.type === 'dir') {
+          results.push(`${target}: directory`);
+        } else {
+          const content = node.content || '';
+          const isAscii = /^[\x09\x0A\x0D\x20-\x7E]*$/.test(content) && !content.includes('\x7FELF') && !content.includes('_RAW_BINARY_NOISE_');
+          if (isAscii) {
+            results.push(`${target}: ASCII text`);
+          } else {
+            results.push(`${target}: data`);
+          }
+        }
+      }
+
+      output = results.join('\n');
       break;
     }
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { KeyRound, X, AlertCircle, Clipboard } from 'lucide-react';
 import { COMPETITION_LEVELS, getTeamUsername, getTeamHomeDir } from '../engine/levels';
+import { submitFlagAPI } from '../services/api';
 
 export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGameState, activePlayer }) {
   const [passwordInput, setPasswordInput] = useState('');
@@ -11,13 +12,15 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
   const teamName = activePlayer?.team_name || activePlayer?.username || 'team';
   const defaultUser = targetUser || getTeamUsername(teamName, Math.min(COMPETITION_LEVELS.length - 1, gameState.currentLevel + 1));
   const levelIdx = parseInt(defaultUser.replace(/^[a-z]+/i, ''), 10) || (gameState.currentLevel + 1);
-  const targetLevelObj = COMPETITION_LEVELS[levelIdx] || COMPETITION_LEVELS[gameState.currentLevel];
 
-  const handleSSHConnect = (e) => {
+  const handleSSHConnect = async (e) => {
     e.preventDefault();
     if (!passwordInput.trim()) return;
 
-    if (passwordInput.trim() === targetLevelObj.password || levelIdx <= gameState.currentLevel) {
+    const targetStage = Math.max(0, levelIdx - 1);
+    const res = await submitFlagAPI(teamName, targetStage, passwordInput.trim());
+
+    if (res && res.correct) {
       setErrorMsg('');
       setGameState(prev => {
         const nextLevel = isNaN(levelIdx) ? prev.currentLevel : levelIdx;
@@ -42,7 +45,7 @@ export default function SSHModal({ isOpen, onClose, targetUser, gameState, setGa
       setPasswordInput('');
       onClose();
     } else {
-      setErrorMsg('Permission denied, please try again.');
+      setErrorMsg(res.error || 'Permission denied, please try again.');
     }
   };
 

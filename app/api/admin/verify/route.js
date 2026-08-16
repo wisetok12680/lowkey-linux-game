@@ -5,7 +5,7 @@ export async function POST(request) {
     const body = await request.json();
     const { adminSecret } = body;
 
-    const expectedSecret = process.env.ADMIN_SECRET || 'admin123';
+    const expectedSecret = process.env.ADMIN_SECRET || process.env.ADMIN_SECRET_KEY || 'LOWKEY_ADMIN_2026_SECURE_KEY';
 
     if (!adminSecret || typeof adminSecret !== 'string') {
       return NextResponse.json({ success: false, error: 'Admin secret key is required' }, { status: 400 });

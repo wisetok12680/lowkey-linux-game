@@ -103,3 +103,22 @@ export async function updateInvigilationAPI(username, fullscreenExits, isDisqual
     throw err;
   }
 }
+
+export async function submitFlagAPI(username, currentLevel, password) {
+  try {
+    const res = await fetch('/api/submit-flag', {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      body: JSON.stringify({ username, currentLevel, password })
+    });
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Error submitting flag:', err);
+    return { success: false, error: err.message || 'Network error submitting flag' };
+  }
+}

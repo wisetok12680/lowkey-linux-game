@@ -393,28 +393,48 @@ function executeSingleCommand(cmdStr, stdinText, state, setState, history) {
     case 'submit':
     case 'flag': {
       const submittedPass = args[0]?.trim();
-      const currentLevelData = COMPETITION_LEVELS[state.currentLevel];
       if (!submittedPass) {
         output = `Usage: submit <stage_password>\nSubmit the password token discovered in current stage to advance.`;
-      } else if (submittedPass === currentLevelData.password) {
-        if (state.currentLevel === 15) {
-          const nextLevel = 16;
-          const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
-          const nextUser = getTeamUsername(teamBase, nextLevel);
-          const nextHome = getTeamHomeDir(teamBase, nextLevel);
+        break;
+      }
 
+      const userKey = state.teamName || state.currentUser;
+      const currentLvl = state.currentLevel;
+
+      (async () => {
+        const res = await submitFlagAPI(userKey, currentLvl, submittedPass);
+        
+        if (res && res.disqualified) {
           setState(prev => ({
             ...prev,
-            currentLevel: 16,
-            currentUser: nextUser,
-            cwd: nextHome,
-            homeDir: nextHome,
             terminalLogs: [
               ...prev.terminalLogs,
               { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
-              {
-                type: 'output',
-                text: `================================================================================
+              { type: 'output', text: res.error || '[ACCESS DENIED] Team Disqualified for Invigilation Violation.' }
+            ]
+          }));
+          return;
+        }
+
+        if (res && res.correct) {
+          if (res.isFinalLevel) {
+            const nextLevel = 16;
+            const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
+            const nextUser = getTeamUsername(teamBase, nextLevel);
+            const nextHome = getTeamHomeDir(teamBase, nextLevel);
+
+            setState(prev => ({
+              ...prev,
+              currentLevel: 16,
+              currentUser: nextUser,
+              cwd: nextHome,
+              homeDir: nextHome,
+              terminalLogs: [
+                ...prev.terminalLogs,
+                { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+                {
+                  type: 'output',
+                  text: `================================================================================
                     🏆 MASTER VAULT UNLOCKED! 🏆
                CONGRATULATIONS - YOU HAVE COMPLETED LOWKEY LINUX!
 ================================================================================
@@ -426,36 +446,45 @@ You have mastered file navigation, POSIX permissions, package tools,
 SSH identity keys, Unix pipeline chaining, stream translation, and forensics!
 
 You are officially a Lowkey Linux Systems Master!`
-              }
+                }
+              ]
+            }));
+          } else {
+            const nextLevel = res.nextLevel;
+            const nextData = COMPETITION_LEVELS[nextLevel];
+            const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
+            const nextUser = getTeamUsername(teamBase, nextLevel);
+            const nextHome = getTeamHomeDir(teamBase, nextLevel);
+
+            if (nextData && nextData.initialTree) {
+              nextData.initialTree(state.vfs, nextUser);
+            }
+            setState(prev => ({
+              ...prev,
+              currentLevel: nextLevel,
+              currentUser: nextUser,
+              cwd: nextHome,
+              homeDir: nextHome,
+              terminalLogs: [
+                ...prev.terminalLogs,
+                { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+                { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextUser}@lowkey-linux.` }
+              ]
+            }));
+          }
+        } else {
+          setState(prev => ({
+            ...prev,
+            terminalLogs: [
+              ...prev.terminalLogs,
+              { type: 'input', user: state.currentUser, cwd: state.cwd, text: cmdStr },
+              { type: 'output', text: res.error || `[ERROR] Incorrect password token for Stage ${currentLvl}. Try again.` }
             ]
           }));
-          return { skipLogUpdate: true };
         }
+      })();
 
-        const nextLevel = Math.min(COMPETITION_LEVELS.length - 1, state.currentLevel + 1);
-        const nextData = COMPETITION_LEVELS[nextLevel];
-        const teamBase = state.teamName || state.currentUser.replace(/\d+$/, '');
-        const nextUser = getTeamUsername(teamBase, nextLevel);
-        const nextHome = getTeamHomeDir(teamBase, nextLevel);
-
-        if (nextData && nextData.initialTree) {
-          nextData.initialTree(state.vfs, nextUser);
-        }
-        setState(prev => ({
-          ...prev,
-          currentLevel: nextLevel,
-          currentUser: nextUser,
-          cwd: nextHome,
-          homeDir: nextHome,
-          terminalLogs: [
-            { type: 'output', text: `[SUCCESS] Correct password! Advancing to Stage ${nextLevel}...\nLinux lowkey-linux 5.15.0-generic x86_64\nLogged in as ${nextUser}@lowkey-linux.` }
-          ]
-        }));
-        return { skipLogUpdate: true };
-      } else {
-        output = `[ERROR] Incorrect password token for Stage ${state.currentLevel}. Try again.`;
-      }
-      break;
+      return { skipLogUpdate: true };
     }
 
     case 'help': {

@@ -308,6 +308,7 @@ export default function GamePage() {
       <FullscreenGuard
         activePlayer={activePlayer}
         gameState={gameState}
+        isWelcomeModalOpen={isWelcomeModalOpen}
       />
     </div>
   );

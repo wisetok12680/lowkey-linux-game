@@ -4,7 +4,7 @@ import { updateInvigilationAPI } from '../services/api';
 
 const MAX_STRIKES = 5;
 
-export default function FullscreenGuard({ activePlayer, gameState }) {
+export default function FullscreenGuard({ activePlayer, gameState, isWelcomeModalOpen }) {
   const [isFullscreen, setIsFullscreen] = useState(true);
   const [exitCount, setExitCount] = useState(0);
   const wasFullscreenRef = useRef(true);
@@ -34,8 +34,8 @@ export default function FullscreenGuard({ activePlayer, gameState }) {
         document.msFullscreenElement
       );
 
-      // Detect transition from FULLSCREEN -> NOT FULLSCREEN
-      if (wasFullscreenRef.current && !isFS) {
+      // Detect transition from FULLSCREEN -> NOT FULLSCREEN (Only when activePlayer is logged in and modal is closed)
+      if (wasFullscreenRef.current && !isFS && activePlayer && !isWelcomeModalOpen) {
         setExitCount(prev => {
           const newCount = prev + 1;
           const isDisq = newCount >= MAX_STRIKES;
@@ -66,7 +66,7 @@ export default function FullscreenGuard({ activePlayer, gameState }) {
       document.removeEventListener('mozfullscreenchange', checkFullscreen);
       document.removeEventListener('MSFullscreenChange', checkFullscreen);
     };
-  }, [storageKey]);
+  }, [storageKey, activePlayer, isWelcomeModalOpen]);
 
   const requestFullscreenMode = () => {
     const elem = document.documentElement;
@@ -82,8 +82,8 @@ export default function FullscreenGuard({ activePlayer, gameState }) {
   const strikesRemaining = Math.max(0, MAX_STRIKES - exitCount);
   const isDisqualified = exitCount >= MAX_STRIKES;
 
-  // Don't render banner if currently in fullscreen and not disqualified
-  if (isFullscreen && !isDisqualified) return null;
+  // Don't render banner if team is not logged in, welcome modal is open, or currently in fullscreen (and not disqualified)
+  if (!activePlayer || isWelcomeModalOpen || (isFullscreen && !isDisqualified)) return null;
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex items-center justify-center p-6 font-sans animate-in fade-in duration-200">

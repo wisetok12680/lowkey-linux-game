@@ -9,6 +9,7 @@ import CheatsheetModal from '@/src/components/CheatsheetModal';
 import SSHModal from '@/src/components/SSHModal';
 import WelcomeTeamModal from '@/src/components/WelcomeTeamModal';
 import VictoryModal from '@/src/components/VictoryModal';
+import FullscreenGuard from '@/src/components/FullscreenGuard';
 import { fetchPlayersAPI, updateProgressAPI } from '@/src/services/api';
 
 const getUserForLevel = (levelData, player) => {
@@ -302,6 +303,11 @@ export default function GamePage() {
         activePlayer={activePlayer}
         gameState={gameState}
         onRestart={handleResetProgress}
+      />
+
+      <FullscreenGuard
+        activePlayer={activePlayer}
+        gameState={gameState}
       />
     </div>
   );

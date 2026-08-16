@@ -24,7 +24,7 @@ import {
   Award,
   Circle
 } from 'lucide-react';
-import { fetchPlayersAPI, deletePlayerAPI, updateProgressAPI } from '@/src/services/api';
+import { fetchPlayersAPI, deletePlayerAPI, updateProgressAPI, updateInvigilationAPI } from '@/src/services/api';
 import { COMPETITION_LEVELS } from '@/src/engine/levels';
 
 export default function AdminDashboardPage() {
@@ -143,6 +143,20 @@ export default function AdminDashboardPage() {
       await loadTeamsData();
     } catch (err) {
       setStatusMsg({ type: 'error', text: err.message || 'Failed to delete team' });
+    }
+  };
+
+  const handleResetInvigilation = async (username) => {
+    try {
+      await updateInvigilationAPI(username, 0, false);
+      if (typeof window !== 'undefined') {
+        const teamKey = `lowkey_fs_exits_${username.toLowerCase()}`;
+        localStorage.removeItem(teamKey);
+      }
+      setStatusMsg({ type: 'success', text: `Reset strikes & un-disqualified Team "${username}"!` });
+      await loadTeamsData();
+    } catch (err) {
+      setStatusMsg({ type: 'error', text: err.message || 'Failed to reset strikes' });
     }
   };
 
@@ -431,6 +445,7 @@ export default function AdminDashboardPage() {
                   <th className="py-4 px-5 font-bold">Team Name</th>
                   <th className="py-4 px-5 font-bold">Current Stage</th>
                   <th className="py-4 px-5 font-bold">Highest Stage</th>
+                  <th className="py-4 px-5 font-bold">Invigilation Exits</th>
                   <th className="py-4 px-5 font-bold">Status</th>
                   <th className="py-4 px-5 font-bold">Registered</th>
                   <th className="py-4 px-5 font-bold">Last Active</th>
@@ -440,7 +455,7 @@ export default function AdminDashboardPage() {
               <tbody className="divide-y divide-slate-800/70">
                 {filteredTeams.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-12 text-slate-500 font-mono text-xs">
+                    <td colSpan={9} className="text-center py-12 text-slate-500 font-mono text-xs">
                       {searchQuery ? `No teams found matching "${searchQuery}"` : 'No teams registered in database yet.'}
                     </td>
                   </tr>
@@ -451,6 +466,7 @@ export default function AdminDashboardPage() {
                     const status = getStatusTag(team.last_active_at);
                     const isMaster = team.highest_level_unlocked >= maxStageCount;
                     const isConfirming = confirmAction && confirmAction.team === team.username;
+                    const isDisqualified = team.is_disqualified || (team.fullscreen_exits >= 5);
 
                     return (
                       <tr 
@@ -521,6 +537,25 @@ export default function AdminDashboardPage() {
                           </span>
                         </td>
 
+                        {/* Invigilation & Exits */}
+                        <td className="py-4 px-5 font-mono">
+                          {isDisqualified ? (
+                            <span className="px-2.5 py-1 text-[10px] bg-red-950/80 text-red-400 border border-red-800/80 rounded-lg font-bold inline-flex items-center gap-1 shadow-sm">
+                              <AlertCircle className="w-3 h-3 text-red-400" />
+                              <span>DISQUALIFIED ({team.fullscreen_exits || 5}/5)</span>
+                            </span>
+                          ) : (
+                            <span className={`px-2.5 py-1 text-[11px] border rounded-lg font-semibold inline-flex items-center gap-1 shadow-sm ${
+                              (team.fullscreen_exits || 0) > 0 
+                                ? 'bg-amber-500/10 text-amber-300 border-amber-500/30' 
+                                : 'bg-slate-900/90 text-slate-400 border-slate-800'
+                            }`}>
+                              <Shield className="w-3 h-3 text-amber-400" />
+                              <span>{team.fullscreen_exits || 0} / 5 Exits</span>
+                            </span>
+                          )}
+                        </td>
+
                         {/* Status Tag */}
                         <td className="py-4 px-5 font-mono">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${status.color}`}>
@@ -560,6 +595,15 @@ export default function AdminDashboardPage() {
                             </div>
                           ) : (
                             <div className="flex items-center justify-end gap-1.5">
+                              {((team.fullscreen_exits || 0) > 0 || isDisqualified) && (
+                                <button
+                                  onClick={() => handleResetInvigilation(team.username)}
+                                  className="p-2 text-amber-400 hover:bg-amber-500/20 rounded-xl transition border border-amber-500/30"
+                                  title="Reset Fullscreen Strikes & Un-disqualify Team"
+                                >
+                                  <Shield className="w-4 h-4 text-amber-400" />
+                                </button>
+                              )}
                               <button
                                 onClick={() => setConfirmAction({ type: 'reset', team: team.username })}
                                 className="p-2 text-slate-400 hover:text-amber-400 hover:bg-slate-800 rounded-xl transition border border-transparent hover:border-slate-700"

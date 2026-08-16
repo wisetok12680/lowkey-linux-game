@@ -77,3 +77,29 @@ export async function deletePlayerAPI(username) {
     throw err;
   }
 }
+
+export async function updateInvigilationAPI(username, fullscreenExits, isDisqualified) {
+  try {
+    const res = await fetch(`/api/players/${encodeURIComponent(username)}`, {
+      method: 'PUT',
+      cache: 'no-store',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      body: JSON.stringify({ 
+        action: 'invigilation', 
+        fullscreenExits, 
+        isDisqualified 
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || 'Failed to update invigilation status');
+    }
+    return data.player;
+  } catch (err) {
+    console.error('Error updating invigilation status:', err);
+    throw err;
+  }
+}

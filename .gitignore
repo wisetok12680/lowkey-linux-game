@@ -21,6 +21,7 @@ dist-isolation
 .next
 .env*.local
 
-# Scratch scripts
+# Local data store & scratch scripts
+data/
 scratch/
 test_db.js

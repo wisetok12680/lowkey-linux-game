@@ -29,11 +29,11 @@ PASSWORDS=(
   "mK90pL34vN81n2k7"
   "xU91mL74vP09n3k2"
   "b64_pW78mX01nL92kP34"
-  "rot13_vK92nL10mP45xQ78"
+  "rot13_vK92nL10mP45kQ78"
   "hex_zK90pL34vN81n2m9"
-  "key_qP89mL34vX01n2k9"
+  "ssh_kP90mL34vX81n2m9"
   "token_pW90nL12vM45xQ78"
-  "CONGRATS_LINUX_MASTER_2026"
+  "MASTER_VAULT_FLAG_2026_ULTIMATE_LINUX_HERO"
 )
 
 echo "[1/8] Installing required packages..."

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Maximize2, ShieldAlert, AlertTriangle, Lock, XCircle, AlertOctagon } from 'lucide-react';
+import { updateInvigilationAPI } from '../services/api';
 
 const MAX_STRIKES = 5;
 
@@ -11,13 +12,18 @@ export default function FullscreenGuard({ activePlayer, gameState }) {
   const teamName = activePlayer?.team_name || activePlayer?.username || gameState?.teamName || 'team';
   const storageKey = `lowkey_fs_exits_${teamName.toLowerCase()}`;
 
-  // Load initial strike count from localStorage
+  // Sync state if activePlayer from DB has disqualification/exits data
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (activePlayer && activePlayer.fullscreen_exits !== undefined) {
+      setExitCount(activePlayer.fullscreen_exits || 0);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(storageKey, (activePlayer.fullscreen_exits || 0).toString());
+      }
+    } else if (typeof window !== 'undefined') {
       const savedCount = parseInt(localStorage.getItem(storageKey) || '0', 10);
       setExitCount(isNaN(savedCount) ? 0 : savedCount);
     }
-  }, [storageKey]);
+  }, [activePlayer, storageKey]);
 
   useEffect(() => {
     const checkFullscreen = () => {
@@ -32,9 +38,12 @@ export default function FullscreenGuard({ activePlayer, gameState }) {
       if (wasFullscreenRef.current && !isFS) {
         setExitCount(prev => {
           const newCount = prev + 1;
+          const isDisq = newCount >= MAX_STRIKES;
           if (typeof window !== 'undefined') {
             localStorage.setItem(storageKey, newCount.toString());
           }
+          const userKey = activePlayer?.username || teamName;
+          updateInvigilationAPI(userKey, newCount, isDisq).catch(err => console.error('Invigilation sync error:', err));
           return newCount;
         });
       }

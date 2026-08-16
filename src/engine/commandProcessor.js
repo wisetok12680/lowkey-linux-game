@@ -492,7 +492,7 @@ You are officially a Lowkey Linux Systems Master!`
 -----------------------------------------
 Filesystem & Search:  ls, cd, pwd, find, cat, head, tail, wc, sort, uniq, tr, grep, base64
 File Modification:   touch, mkdir, rm, cp, mv, chmod, chown
-CTF & Progression:    submit <pass>, flag <pass>, ssh, man, help, history, clear, exit
+Competition & Progression:    submit <pass>, flag <pass>, ssh, man, help, history, clear, exit
 Package Manager & Tools: apt, pacman, inspect-tool <logfile>
 
 Pipes: Supports '|' command chaining (e.g. cat data.txt | grep -v 'decoy' | base64 -d)`;

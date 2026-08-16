@@ -114,7 +114,7 @@ export default function FullscreenGuard({ activePlayer, gameState, isWelcomeModa
         <p className="text-slate-300 text-xs mt-2 leading-relaxed">
           {isDisqualified ? (
             <span className="text-red-400 font-semibold">
-              You have exceeded the maximum limit of {MAX_STRIKES} fullscreen exits. Your CTF session has been permanently locked for invigilation review.
+              You have exceeded the maximum limit of {MAX_STRIKES} fullscreen exits. Your competition session has been permanently locked for invigilation review.
             </span>
           ) : (
             <span>

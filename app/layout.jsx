@@ -1,8 +1,8 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Lowkey Linux - Interactive Privilege Escalation CTF',
-  description: 'Master Linux command-line skills and privilege escalation levels in an interactive browser terminal backed by Neon Postgres.',
+  title: 'Lowkey Linux - Interactive System Competition',
+  description: 'Master Linux command-line skills and system engineering levels in an interactive browser terminal backed by Neon Postgres.',
 };
 
 export default function RootLayout({ children }) {

@@ -68,7 +68,7 @@ export default function GamePage() {
       history: [],
       installedPackages: new Set(),
       terminalLogs: [
-        { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux CTF\nLogged in as ${defaultUser}@lowkey-linux.` }
+        { type: 'output', text: `Linux lowkey-linux 5.15.0-generic x86_64\nWelcome to Lowkey Linux\nLogged in as ${defaultUser}@lowkey-linux.` }
       ]
     };
   });

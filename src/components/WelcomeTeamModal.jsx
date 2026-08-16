@@ -68,7 +68,7 @@ export default function WelcomeTeamModal({ isOpen, onSubmitSuccess }) {
           </div>
           <div className="flex items-center justify-center gap-2">
             <span className="px-2 py-0.5 text-[10px] font-mono font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-full flex items-center gap-1">
-              <Sparkles className="w-2.5 h-2.5" /> LOWKEY LINUX CTF
+              <Sparkles className="w-2.5 h-2.5" /> LOWKEY LINUX COMPETITION
             </span>
           </div>
           <h2 className="text-xl font-extrabold text-slate-100 tracking-tight font-mono">

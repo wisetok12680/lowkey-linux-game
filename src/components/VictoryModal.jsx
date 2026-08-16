@@ -111,7 +111,7 @@ export default function VictoryModal({ isOpen, activePlayer, gameState, onRestar
         {/* Footer Actions */}
         <div className="px-6 py-4 bg-[#0a0d14] border-t border-slate-800 flex items-center justify-between">
           <div className="text-xs text-slate-400 font-mono">
-            Lowkey Linux CTF Engine v2.4
+            Lowkey Linux Competition Engine v2.4
           </div>
 
           <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export default function VictoryModal({ isOpen, activePlayer, gameState, onRestar
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white rounded-lg text-xs font-semibold shadow-lg shadow-emerald-600/20 transition cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>Restart CTF Campaign</span>
+              <span>Restart Competition</span>
             </button>
           </div>
         </div>

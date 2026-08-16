@@ -305,7 +305,7 @@ export default function AdminDashboardPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Real-time CTF team tracking & level progression leaderboard
+                Real-time team tracking & level progression leaderboard
               </p>
             </div>
           </div>

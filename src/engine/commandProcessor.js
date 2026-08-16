@@ -1,4 +1,4 @@
-// Advanced Command Processor Engine for Lowkey Linux Simulator
+// Advanced Command Processor Engine for Lowkey Linux System Competition
 
 import { COMPETITION_LEVELS, getTeamUsername, getTeamHomeDir } from './levels';
 

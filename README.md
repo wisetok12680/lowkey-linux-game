@@ -5,13 +5,13 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38BDF8?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 
-An interactive, web-based gamified Linux terminal simulator and system competition. Designed for students and security enthusiasts to learn Linux CLI commands, filesystem navigation, permission escalation, and data pipeline filtering in a safe, client-side sandbox.
+An interactive, web-based gamified Linux terminal workspace and system competition. Designed for students and security enthusiasts to learn Linux CLI commands, filesystem navigation, permission escalation, and data pipeline filtering in a safe, client-side sandbox.
 
 ---
 
 ## 🌟 Key Features
 
-- 🖥️ **Full-Featured Shell Simulator**:
+- 🖥️ **Full-Featured Shell Environment**:
   - Tab autocompletion for commands & file paths.
   - Shell command history stack (`↑` / `↓` arrow keys & `history` command).
   - Pipe operator (`|`) support for text transformation pipelines (`cat file | grep -v 'decoy' | base64 -d`).

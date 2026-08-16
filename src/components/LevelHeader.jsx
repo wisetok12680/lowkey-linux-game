@@ -22,7 +22,7 @@ export default function LevelHeader({ gameState, setGameState, currentLevelData,
                 COMPETITION
               </span>
             </div>
-            <p className="text-xs text-slate-400">Escalation CTF Simulator</p>
+            <p className="text-xs text-slate-400">Interactive System Competition</p>
           </div>
 
           <div className="h-6 w-px bg-slate-800 mx-1 hidden sm:block" />
